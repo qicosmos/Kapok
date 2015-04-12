@@ -126,7 +126,7 @@ private:
 		size_t sz = arr.Size();
 		for (size_t i = 0; i < sz; i++)
 		{
-			U::value_type value;
+			typename U::value_type value;
 			ReadValue(value, arr[i], i);
 			push(t, value);
 		}
@@ -155,8 +155,8 @@ private:
 		{
 			Value& element = v[i];
 
-			U::key_type key;
-			U::value_type::second_type value;
+			typename U::key_type key;
+			typename U::value_type::second_type value;
 			ReadValue(key, element["0"], i); //key
 			ReadObject(value, element["1"]); //value
 
