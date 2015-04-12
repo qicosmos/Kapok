@@ -2,6 +2,9 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
+#include <array>
+#include <queue>
+#include <stack>
 using namespace std;
 
 namespace detail
