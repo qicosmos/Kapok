@@ -177,17 +177,6 @@ public:
 		m_writer.Bool(val);
 	}
 
-	//void WriteValue(bool val)
-	//{
-	//	m_writer.Bool(val); 
-	//}
-
-	template <unsigned N, typename T>
-	void WriteValue(T(&p)[N]) 
-	{
-		cout << "定长数组" << endl;
-	}
-
 	//还要过滤智能指针的情况
 	template<typename T>
 	typename std::enable_if<is_pointer_ext<T>::value>::type WriteValue(T val)
