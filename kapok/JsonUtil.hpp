@@ -177,22 +177,11 @@ public:
 		m_writer.Bool(val);
 	}
 
-	//void WriteValue(bool val)
-	//{
-	//	m_writer.Bool(val); 
-	//}
-
-	template <unsigned N, typename T>
-	void WriteValue(T(&p)[N]) 
-	{
-		cout << "¶¨³¤Êı×é" << endl;
-	}
-
-	//»¹Òª¹ıÂËÖÇÄÜÖ¸ÕëµÄÇé¿ö
+	//è¿˜è¦è¿‡æ»¤æ™ºèƒ½æŒ‡é’ˆçš„æƒ…å†µ
 	template<typename T>
 	typename std::enable_if<is_pointer_ext<T>::value>::type WriteValue(T val)
 	{
-		//²»Ö§³Ö¶¯Ì¬Ö¸ÕëµÄÔ­ÒòÊÇ·´ĞòÁĞ»¯µÄÊ±ºòÉæ¼°µ½Ö¸ÕëµÄÄÚ´æ¹ÜÀí£¬·´ĞòÁĞ»¯²»Ó¦¸Ã¿¼ÂÇÎª¶ÔÏó·ÖÅäÄÚ´æ
+		//ä¸æ”¯æŒåŠ¨æ€æŒ‡é’ˆçš„åŸå› æ˜¯ååºåˆ—åŒ–çš„æ—¶å€™æ¶‰åŠåˆ°æŒ‡é’ˆçš„å†…å­˜ç®¡ç†ï¼Œååºåˆ—åŒ–ä¸åº”è¯¥è€ƒè™‘ä¸ºå¯¹è±¡åˆ†é…å†…å­˜
 		throw std::invalid_argument("not surpport dynamic pointer");
 	}
 
@@ -207,8 +196,8 @@ public:
 	}
 
 private:
-	StringBuffer m_buf; //json×Ö·û´®µÄbuf
-	JsonWriter m_writer; //jsonĞ´ÈëÆ÷
+	StringBuffer m_buf; //jsonå­—ç¬¦ä¸²çš„buf
+	JsonWriter m_writer; //jsonå†™å…¥å™¨
 	Document m_doc;
 };
 
