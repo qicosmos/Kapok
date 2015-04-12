@@ -5,7 +5,7 @@
 class DeSerializer : NonCopyable
 {
 public:
-
+	DeSerializer() = default;
 	DeSerializer(const char* jsonText)
 	{
 		Parse(jsonText);
@@ -34,14 +34,14 @@ public:
 		ReadObject(t, jsonval);
 	}
 
-	//·´ĞòÁĞ»¯¶¨³¤Êı×é
+	//ååºåˆ—åŒ–å®šé•¿æ•°ç»„
 	template <typename T, size_t N>
 	void Deserialize(T(&p)[N], const char* key)
 	{
 		ReadArray<T>(p, key);
 	}
 
-	//·´ĞòÁĞ»¯std::array
+	//ååºåˆ—åŒ–std::array
 	template<typename T, size_t N>
 	void Deserialize(std::array<T, N>& arr, const char* key)
 	{
@@ -71,21 +71,21 @@ private:
 		}
 	}
 
-	//·´ĞòÁĞ»¯tuple
+	//ååºåˆ—åŒ–tuple
 	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val)
 	{
 		ReadTuple(t, val);
 	}
 
-	//·´ĞòÁĞ»¯×Ô¶¨Òåclass
+	//ååºåˆ—åŒ–è‡ªå®šä¹‰class
 	template<typename T>
 	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, Value& val)
 	{
 		ReadTuple(t.Meta(), val);
 	}
 
-	//tupleÖĞµÄÔªËØÀàĞÍ²»ÄÜÎªconst char*£¬·ñÔòÎŞ·¨¸³Öµ
+	//tupleä¸­çš„å…ƒç´ ç±»å‹ä¸èƒ½ä¸ºconst char*ï¼Œå¦åˆ™æ— æ³•èµ‹å€¼
 	template<typename Tuple>
 	void ReadTuple(Tuple& tp, Value& val)
 	{
@@ -117,7 +117,7 @@ private:
 		}
 	}
 
-	//·´ĞòÁĞ»¯·ÇmapµÄÈİÆ÷ºÍÈİÆ÷ÊÊÅäÆ÷
+	//ååºåˆ—åŒ–émapçš„å®¹å™¨å’Œå®¹å™¨é€‚é…å™¨
 	template<typename T>
 	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -144,7 +144,7 @@ private:
 		t.push(v);
 	}
 
-	//·´ĞòÁĞ»¯mapÈİÆ÷
+	//ååºåˆ—åŒ–mapå®¹å™¨
 	template<typename T>
 	typename std::enable_if<is_map_container<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -164,7 +164,7 @@ private:
 		}
 	}
 
-	//ĞòÁĞ»¯»ù±¾ÀàĞÍ
+	//åºåˆ—åŒ–åŸºæœ¬ç±»å‹
 	template<typename T>
 	typename std::enable_if<is_basic_type<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -184,7 +184,7 @@ private:
 		m_jsutil.ReadValue(std::forward<T>(t), val);
 	}
 
-	//¶¨³¤Êı×é
+	//å®šé•¿æ•°ç»„
 	template<typename T, size_t N>
 	void ReadValue(T(&t)[N], Value& val, std::size_t M)
 	{
