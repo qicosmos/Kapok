@@ -3,7 +3,6 @@
 #include "Common.hpp"
 #include "JsonUtil.hpp"
 
-//严格按照字段的顺序进行序列化和反序列化, 定长数组
 class Serializer : NonCopyable
 {
 public:
@@ -21,7 +20,6 @@ public:
 		return m_jsutil.GetJosnText();
 	}
 
-	//序列化普通的结构体，没有嵌套，没有容器数组
 	template<typename T>
 	void Serialize(T&& t, const char* key)
 	{	
@@ -41,14 +39,12 @@ private:
 		m_jsutil.EndObject();
 	}
 
-	//序列化自定义类型
 	template<typename T>
 	typename std::enable_if<is_user_class<T>::value>::type WriteObject(T&& t)
 	{
 		WriteTuple(t.Meta());
 	}
 
-	//序列化tuple
 	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type WriteObject(T&& t)
 	{
@@ -67,16 +63,12 @@ private:
 		WriteTuple<I + 1>(t);
 	}
 
-	/*************序列化容器*************/
-
-	//序列化非map容器
 	template<typename T>
 	typename std::enable_if<is_singlevalue_container<T>::value>::type WriteObject(T&& t)
 	{
 		WriteArray(t);
 	}
 
-	//序列化适配器
 	template<typename T>
 	typename std::enable_if<is_stack<T>::value || is_priority_queue<T>::value>::type WriteObject(T&& t)
 	{
@@ -97,15 +89,12 @@ private:
 		m_jsutil.EndArray();
 	}
 
-	//序列化适配器
 	template<typename T>
 	typename std::enable_if<is_queue<T>::value>::type WriteObject(T&& t)
 	{
 		WriteAdapter(t, [&]{return t.front(); });
 	}
 
-	//序列化map容器
-	/************************************/
 	template<typename T>
 	typename std::enable_if<is_map_container<T>::value>::type WriteObject(T&& t)
 	{
@@ -122,16 +111,12 @@ private:
 		}
 	}
 
-	/*************序列化数组*************/
-
-	//序列化std::array
 	template<typename T, size_t N>
 	void WriteObject(std::array<T, N>& t)
 	{
 		WriteArray(t);
 	}
 
-	//序列化定长数组
 	template <typename T, size_t N>
 	void WriteObject(T(&p)[N])
 	{
@@ -151,16 +136,12 @@ private:
 		m_jsutil.EndArray();
 	}
 
-	/************************************/
-
-	//序列化基本类型
 	template<typename T>
 	typename std::enable_if<is_basic_type<T>::value>::type WriteObject(T&& t)
 	{
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
 
-	//tuple和自定义类型可以合并
 	template<typename T>
 	typename std::enable_if<is_normal_class<T>::value>::type WriteValue(T&& t, std::size_t M)
 	{
@@ -173,7 +154,6 @@ private:
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
 
-	//定长数组
 	template <unsigned N, typename T>
 	void WriteValue(T(&p)[N], std::size_t M)
 	{
