@@ -34,14 +34,12 @@ public:
 		ReadObject(t, jsonval);
 	}
 
-	//反序列化定长数组
 	template <typename T, size_t N>
 	void Deserialize(T(&p)[N], const char* key)
 	{
 		ReadArray<T>(p, key);
 	}
 
-	//反序列化std::array
 	template<typename T, size_t N>
 	void Deserialize(std::array<T, N>& arr, const char* key)
 	{
@@ -71,21 +69,18 @@ private:
 		}
 	}
 
-	//反序列化tuple
 	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val)
 	{
 		ReadTuple(t, val);
 	}
 
-	//反序列化自定义class
 	template<typename T>
 	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, Value& val)
 	{
 		ReadTuple(t.Meta(), val);
 	}
 
-	//tuple中的元素类型不能为const char*，否则无法赋值
 	template<typename Tuple>
 	void ReadTuple(Tuple& tp, Value& val)
 	{
@@ -117,7 +112,6 @@ private:
 		}
 	}
 
-	//反序列化非map的容器和容器适配器
 	template<typename T>
 	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -144,7 +138,6 @@ private:
 		t.push(v);
 	}
 
-	//反序列化map容器
 	template<typename T>
 	typename std::enable_if<is_map_container<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -164,7 +157,6 @@ private:
 		}
 	}
 
-	//序列化基本类型
 	template<typename T>
 	typename std::enable_if<is_basic_type<T>::value>::type ReadObject(T&& t, Value& v)
 	{
@@ -184,7 +176,6 @@ private:
 		m_jsutil.ReadValue(std::forward<T>(t), val);
 	}
 
-	//定长数组
 	template<typename T, size_t N>
 	void ReadValue(T(&t)[N], Value& val, std::size_t M)
 	{
