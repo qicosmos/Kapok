@@ -82,7 +82,7 @@ private:
 	}
 
 	template<typename Tuple>
-	void ReadTuple(Tuple& tp, Value& val)
+	void ReadTuple(Tuple&& tp, Value& val)
 	{
 		if (val.Size() != std::tuple_size<Tuple>::value)
 			throw std::logic_error("wrong object");
