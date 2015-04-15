@@ -72,7 +72,7 @@ private:
 	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val)
 	{
-		ReadTuple(t, val);
+		ReadTuple(std::forward<T>(t), val);
 	}
 
 	template<typename T>
