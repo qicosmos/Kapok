@@ -10,6 +10,11 @@ public:
 	{
 		Parse(jsonText);
 	}
+	
+	DeSerializer(const string& jsonText)
+	{
+		Parse(jsonText);
+	}
 
 	~DeSerializer()
 	{
