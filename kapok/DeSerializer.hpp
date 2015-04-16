@@ -14,6 +14,11 @@ public:
 	~DeSerializer()
 	{
 	}
+	
+	void Parse(const string& jsonText)
+	{
+		Parse(jsonText.c_str());
+	}
 
 	void Parse(const char* jsonText)
 	{
@@ -23,6 +28,12 @@ public:
 	Document&  GetDocument()
 	{
 		return m_jsutil.GetDocument();
+	}
+	
+	template<typename T>
+	void Deserialize(T& t, const string& key)
+	{
+		Deserialize(t, key.c_str())
 	}
 
 	template<typename T>
