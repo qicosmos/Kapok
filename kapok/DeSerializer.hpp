@@ -38,7 +38,7 @@ public:
 	template<typename T>
 	void Deserialize(T& t, const string& key)
 	{
-		Deserialize(t, key.c_str())
+		Deserialize(t, key.c_str());
 	}
 
 	template<typename T>
