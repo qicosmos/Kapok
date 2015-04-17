@@ -44,8 +44,7 @@ public:
 	template<typename T>
 	void Deserialize(T& t, const char* key)
 	{
-		Document& doc = m_jsutil.GetDocument();
-		Value& jsonval = doc[key];
+		Value& jsonval = GetRootValue(key);
 
 		ReadObject(t, jsonval);
 	}
@@ -63,11 +62,19 @@ public:
 	}
 
 private:
+        Value& GetRootValue(const char* key)
+	{
+		Document& doc = m_jsutil.GetDocument();
+		if (!doc.HasMember(key))
+			throw std::invalid_argument("the key is not exist");
+
+		return doc[key];
+	}
+	
 	template<typename value_type, typename T>
 	void ReadArray(T& t, const char* key)
 	{
-		Document& doc = m_jsutil.GetDocument();
-		Value& jsonval = doc[key];
+		Value& jsonval = GetRootValue(key);
 
 		ReadArray<value_type>(t, jsonval);
 	}
