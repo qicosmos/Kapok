@@ -61,17 +61,17 @@ namespace detail
 		};
 	};
 
-//#define HAS_XXX_TYPE(token)\
-//	template <typename T>struct has_##token{\
-//	private:\
-//	template<typename C> static std::true_type Check(typename C::token##*); \
-//		template<typename C> static std::false_type  Check(...);\
-//	public:\
-//		enum\
-//		{\
-//			value = std::is_same<decltype(Check<T>(0)), std::true_type>::value\
-//		};\
-//	};\
+//#define HAS_XXX_TYPE(token)
+//	template <typename T>struct has_##token{
+//	private:
+//	template<typename C> static std::true_type Check(typename C::token##*); 
+//		template<typename C> static std::false_type  Check(...);
+//	public:
+//		enum
+//		{
+//			value = std::is_same<decltype(Check<T>(0)), std::true_type>::value
+//		};
+//	};
 //
 //	HAS_XXX_TYPE(const_iterator)
 //	HAS_XXX_TYPE(mapped_type)
@@ -81,8 +81,8 @@ namespace detail
 	template<typename T> struct is_poiner_extent<std::unique_ptr<T>> : std::true_type{};
 	template<typename T> struct is_poiner_extent<std::weak_ptr<T>> : std::true_type{};
 
-//#define IS_SMART_POINTER(token)\
-//	template<typename T> struct is_poiner_extent<std::token##_ptr<T>> : std::true_type{}; \
+//#define IS_SMART_POINTER(token)
+//	template<typename T> struct is_poiner_extent<std::token##_ptr<T>> : std::true_type{}; 
 //
 //	IS_SMART_POINTER(shared)
 //	IS_SMART_POINTER(unique)
@@ -126,8 +126,8 @@ template<typename T> struct is_queue : is_specialization_of<detail::decay_t<T>, 
 template<typename T> struct is_stack : is_specialization_of<detail::decay_t<T>, std::stack>{};
 template<typename T> struct is_priority_queue : is_specialization_of<detail::decay_t<T>, std::priority_queue>{};
 
-//#define IS_TEMPLATE_CLASS(token)\
-//template<typename T> struct is_##token : is_specialization_of<detail::decay_t<T>, std::token##>{}; \
+//#define IS_TEMPLATE_CLASS(token)
+//template<typename T> struct is_##token : is_specialization_of<detail::decay_t<T>, std::token##>{}; 
 //
 //IS_TEMPLATE_CLASS(tuple)
 //IS_TEMPLATE_CLASS(queue)
