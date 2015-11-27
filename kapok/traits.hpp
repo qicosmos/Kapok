@@ -12,11 +12,16 @@ namespace detail
 	template<typename T>
 	using decay_t = typename std::decay<T>::type;
 
-	template<typename T> std::false_type static check_tuple_size(...);
-	template<typename T> std::true_type static  check_tuple_size(decltype(std::tuple_size<T>::value)*);
+	//template<typename T> std::false_type static check_tuple_size(...);
+	//template<typename T> std::true_type static  check_tuple_size(decltype(std::tuple_size<T>::value)*);
+	template < template <typename...> class Template, typename T >
+	struct is_instantiation_of : std::false_type {};
 
+	template < template <typename...> class Template, typename... Args >
+	struct is_instantiation_of< Template, Template<Args...> > : std::true_type {};
+	
 	template<typename T>
-	struct has_tuple_size : decltype(check_tuple_size<T>(nullptr))
+	struct is_tuple : is_instantiation_of<std::tuple, T>
 	{
 	};
 
@@ -96,7 +101,7 @@ template <typename T>
 struct is_container : public std::integral_constant<bool, detail::has_const_iterator<detail::decay_t<T>>::value&&detail::has_begin_end<detail::decay_t<T>>::value>{};
 
 template <typename T>
-struct is_singlevalue_container : public std::integral_constant<bool, !std::is_array<detail::decay_t<T>>::value&&!detail::has_tuple_size<detail::decay_t<T>>::value && is_container<detail::decay_t<T>>::value&&!detail::has_mapped_type<detail::decay_t<T>>::value>{};
+struct is_singlevalue_container : public std::integral_constant<bool, !std::is_array<detail::decay_t<T>>::value&&!detail::is_tuple<detail::decay_t<T>>::value && is_container<detail::decay_t<T>>::value&&!detail::has_mapped_type<detail::decay_t<T>>::value>{};
 
 template <typename T>
 struct is_map_container : public std::integral_constant<bool, is_container<detail::decay_t<T>>::value&&detail::has_mapped_type<detail::decay_t<T>>::value>{};
