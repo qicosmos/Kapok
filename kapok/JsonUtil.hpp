@@ -100,7 +100,7 @@ public:
 	{
 		t = (uint8_t)val.GetInt();
 	}
-	
+
 	void WriteValue(int8_t val)
 	{
 		m_writer.Int(val);
@@ -220,4 +220,3 @@ private:
 	JsonWriter m_writer; //json写入器
 	Document m_doc;
 };
-
