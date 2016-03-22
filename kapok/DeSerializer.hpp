@@ -112,7 +112,7 @@ private:
 
 		for (size_t j = 0; j < val.Size(); j++)
 		{
-			SetValueByIndex(j, tp, val[j]);
+			SetValueByIndex(j, tp, val[rapidjson::SizeType(j)]);
 		}
 	}
 
