@@ -84,7 +84,7 @@ private:
 	{
 		Value& arr = jsonval[size_t(0)];
 		size_t sz = arr.Size();
-		for (size_t i = 0; i < sz; i++)
+		for (SizeType i = 0; i < sz; i++)
 		{
 			value_type value;
 			ReadValue(value, arr[i], i);
@@ -110,9 +110,9 @@ private:
 		if (val.Size() != std::tuple_size<Tuple>::value)
 			throw std::logic_error("wrong object");
 
-		for (size_t j = 0; j < val.Size(); j++)
+		for (SizeType j = 0; j < val.Size(); j++)
 		{
-			SetValueByIndex(j, tp, val[rapidjson::SizeType(j)]);
+			SetValueByIndex(j, tp, val[j]);
 		}
 	}
 
@@ -141,7 +141,7 @@ private:
 		using U = typename std::decay<T>::type;
 		Value& arr = v[size_t(0)];
 		size_t sz = arr.Size();
-		for (size_t i = 0; i < sz; i++)
+		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
 			ReadValue(value, arr[i], i);
