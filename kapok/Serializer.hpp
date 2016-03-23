@@ -78,7 +78,7 @@ private:
 	template<typename Adapter, typename F>
 	inline void WriteAdapter(Adapter& v, F f)
 	{
-		m_jsutil.StartArray();
+		//m_jsutil.StartArray();
 		int index = 0;
 		for (size_t i = 0, size = v.size(); i < size; i++)
 		{
@@ -86,7 +86,7 @@ private:
 			v.pop();
 			index++;
 		}
-		m_jsutil.EndArray();
+		//m_jsutil.EndArray();
 	}
 
 	template<typename T>
@@ -126,14 +126,14 @@ private:
 	template<typename Array>
 	inline void WriteArray(Array& v)
 	{
-		m_jsutil.StartArray();
+		//m_jsutil.StartArray();
 		int index = 0;
 		for (auto i : v)
 		{
 			WriteValue(i, index);
 			index++;
 		}
-		m_jsutil.EndArray();
+		//m_jsutil.EndArray();
 	}
 
 	template<typename T>

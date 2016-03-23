@@ -5,6 +5,7 @@
 #include <array>
 #include <queue>
 #include <stack>
+#include <set>
 using namespace std;
 
 namespace detail
@@ -98,7 +99,7 @@ template<typename T>
 struct is_string : std::integral_constant<bool, std::is_same<detail::decay_t<T>, std::string>::value>{};
 
 template <typename T>
-struct is_container : public std::integral_constant<bool, detail::has_const_iterator<detail::decay_t<T>>::value&&detail::has_begin_end<detail::decay_t<T>>::value>{};
+struct is_container : public std::integral_constant<bool, detail::has_const_iterator<detail::decay_t<T>>::value&&detail::has_begin_end<detail::decay_t<T>>::value&&!is_string<T>::value>{};
 
 template <typename T>
 struct is_singlevalue_container : public std::integral_constant<bool, !std::is_array<detail::decay_t<T>>::value&&!detail::is_tuple<detail::decay_t<T>>::value && is_container<detail::decay_t<T>>::value&&!detail::has_mapped_type<detail::decay_t<T>>::value>{};
@@ -129,6 +130,9 @@ struct is_specialization_of<Template<Args...>, Template> : std::true_type{};
 template<typename T> struct is_tuple : is_specialization_of<detail::decay_t<T>, std::tuple>{};
 template<typename T> struct is_queue : is_specialization_of<detail::decay_t<T>, std::queue>{};
 template<typename T> struct is_stack : is_specialization_of<detail::decay_t<T>, std::stack>{};
+template<typename T> struct is_set : is_specialization_of<detail::decay_t<T>, std::set> {};
+template<typename T> struct is_multiset : is_specialization_of<detail::decay_t<T>, std::multiset> {};
+template<typename T> struct is_unordered_set : is_specialization_of<detail::decay_t<T>, std::unordered_set> {};
 template<typename T> struct is_priority_queue : is_specialization_of<detail::decay_t<T>, std::priority_queue>{};
 
 //#define IS_TEMPLATE_CLASS(token)

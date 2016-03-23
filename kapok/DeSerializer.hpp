@@ -82,12 +82,12 @@ private:
 	template<typename value_type, typename T>
 	void ReadArray(T& t, Value& jsonval)
 	{
-		Value& arr = jsonval[size_t(0)];
-		size_t sz = arr.Size();
+		//Value& arr = jsonval[size_t(0)];
+		size_t sz = jsonval.Size();
 		for (SizeType i = 0; i < sz; i++)
 		{
 			value_type value;
-			ReadValue(value, arr[i], i);
+			ReadValue(value, jsonval[i], i);
 			t[i] = value;
 		}
 	}
@@ -139,20 +139,26 @@ private:
 	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
 	{
 		using U = typename std::decay<T>::type;
-		Value& arr = v[size_t(0)];
-		size_t sz = arr.Size();
+		//Value& arr = v[size_t(0)];
+		size_t sz = v.Size();
 		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
-			ReadValue(value, arr[i], i);
+			ReadValue(value, v[i], i);
 			push(t, value);
 		}
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_singlevalue_container<T>::value>::type push(T& t, value_type& v)
+	typename std::enable_if<is_singlevalue_container<T>::value&&!is_set<T>::value&&!is_multiset<T>::value&&!is_unordered_set<T>::value>::type push(T& t, value_type& v)
 	{
 		t.push_back(v);
+	}
+
+	template<typename T, typename value_type>
+	typename std::enable_if<is_set<T>::value||is_multiset<T>::value|| is_unordered_set<T>::value>::type push(T& t, value_type& v)
+	{
+		t.insert(v);
 	}
 
 	template<typename T, typename value_type>
@@ -167,7 +173,7 @@ private:
 		using U = typename std::decay<T>::type;
 
 		size_t sz = v.Size();
-		for (size_t i = 0; i < sz; i++)
+		for (SizeType i = 0; i < sz; i++)
 		{
 			Value& element = v[i];
 
