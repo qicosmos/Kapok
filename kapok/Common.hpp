@@ -1,21 +1,45 @@
 #pragma once
 
-#define META(...) auto Meta()->decltype(std::tie(__VA_ARGS__)){return std::tie(__VA_ARGS__);}
+template<unsigned N>
+std::array<std::string, N> split(const std::string& s, const char delimiter)
+{
+	size_t start = 0;
+	size_t end = s.find_first_of(delimiter);
 
-static const char* Int2String[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
-							 "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
-							 "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-							 "31", "32", "33", "34", "35", "36", "37", "38", "39", "40",
-							 "41", "42", "43", "44", "45", "46", "47", "48", "49", "50",
-							 "51", "52", "53", "54", "55", "56", "57", "58", "59", "60",
-							 "61", "62", "63", "64", "65", "66", "67", "68", "69", "70",
-							 "71", "72", "73", "74", "75", "76", "77", "78", "79", "80",
-							 "81", "82", "83", "84", "85", "86", "87", "88", "89", "90",
-							 "91", "92", "93", "94", "95", "96", "97", "98", "99", "100",
-							 "101", "102", "103", "104", "105", "106", "107", "108", "109", "110",
-							 "111", "112", "113", "114", "115", "116", "117", "118", "119", "120",
-							 "121", "122", "123", "124", "125", "126", "127", "128", "129", "130"
-};
+	std::array<std::string, N> output;
+
+	size_t i = 0;
+	while (end <= std::string::npos)
+	{
+		output[i++] = std::move(s.substr(start, end - start));
+		if (end == std::string::npos)
+			break;
+
+		start = end + 2;
+		end = s.find_first_of(delimiter, start);
+	}
+
+	return output;
+}
+
+template<unsigned N, typename T>
+constexpr static inline auto make(const std::array<std::string, N>&ar, unsigned index, T& args)
+{
+	return args;
+}
+
+template<unsigned N, typename T, typename T1, typename... Args>
+constexpr static inline auto make(const std::array<std::string, N>&ar, unsigned index, T const & t, T1& first, Args&... args)
+{
+	return make(ar, index + 1, std::tuple_cat(t, std::make_tuple(std::pair<std::string, T1&>(ar[index], first))), args...);
+}
+
+#define VA_ARGS_NUM(...) std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value
+
+#define META(...) auto Meta(){\
+	auto ar = split<VA_ARGS_NUM(__VA_ARGS__)>(#__VA_ARGS__, ',');\
+	return make(ar, 0, std::tuple<>(), __VA_ARGS__);\
+}
 
 class NonCopyable
 {

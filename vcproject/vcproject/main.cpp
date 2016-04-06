@@ -53,6 +53,7 @@ struct person
 	int age;
 	std::string name;
 	META(age, name);
+
 };
 
 template<class T>
@@ -68,8 +69,47 @@ void test_object(T& t)
 	dr.Deserialize(de_t, "test");
 }
 
+struct test_p
+{
+	int a;
+	int b;
+	META(a, b);
+	
+	std::tuple<std::pair<int&, int&>> get()
+	{
+		return std::make_tuple(std::pair<int&, int&>( a,b ) );
+	}
+};
+
+void test_new_meta()
+{
+	person p = { 20, "test" };
+	test_p p1 = { 1,2 };
+
+	test_p pp = {};
+	auto& tp1 = pp.get();
+
+	std::get<0>(tp1).first = 21;
+	std::get<0>(tp1).second = 12;
+
+	std::cout << typeid(tp1).name() << std::endl;
+	std::cout << typeid(p1.Meta()).name() << std::endl;
+
+	Serializer sr;
+	sr.Serialize(p, "test");
+	std::string str = sr.GetString();
+	std::cout << str << std::endl;
+
+	DeSerializer dr;
+	dr.Parse(sr.GetString());
+	person de_t;
+	dr.Deserialize(de_t, "test");
+}
+
 int main()
 {
+	test_new_meta();
+
 	std::array<std::string, 5> arr = { "a","b","c", "d", "e" };
 	test_array(arr);
 
@@ -122,8 +162,13 @@ int main()
 	std::unordered_map<int, std::string> unodermap = { { 1, "a" },{ 2, "b" } };
 	test_map(unodermap);
 
+	std::map<std::string, int> map1 = { { "a", 1 },{ "b", 2 } };
+	test_map(map1);
+
 	person p = { 20, "test" };
 	test_object(p);
 
+	std::map<std::string, person> map2= { {"a", p} };
+	test_map(map2);
 	return 0;
 }

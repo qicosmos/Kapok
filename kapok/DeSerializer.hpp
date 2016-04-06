@@ -1,6 +1,7 @@
 #pragma once
 #include "JsonUtil.hpp"
 #include "traits.hpp"
+#include <boost/lexical_cast.hpp>
 
 class DeSerializer : NonCopyable
 {
@@ -82,12 +83,11 @@ private:
 	template<typename value_type, typename T>
 	void ReadArray(T& t, Value& jsonval)
 	{
-		//Value& arr = jsonval[size_t(0)];
 		size_t sz = jsonval.Size();
 		for (SizeType i = 0; i < sz; i++)
 		{
 			value_type value;
-			ReadValue(value, jsonval[i], i);
+			ReadValue(value, jsonval[i]);
 			t[i] = value;
 		}
 	}
@@ -107,12 +107,11 @@ private:
 	template<typename Tuple>
 	void ReadTuple(Tuple&& tp, Value& val)
 	{
-		if (val.Size() != std::tuple_size<Tuple>::value)
-			throw std::logic_error("wrong object");
-
-		for (SizeType j = 0; j < val.Size(); j++)
+		const int size = std::tuple_size<Tuple>::value;
+		
+		for (SizeType j = 0; j < size; j++)
 		{
-			SetValueByIndex(j, tp, val[j]);
+			SetValueByIndex(j, tp, val);
 		}
 	}
 
@@ -127,7 +126,7 @@ private:
 	{
 		if (k == index)
 		{
-			ReadValue(std::get<k>(tp), val, k);
+			ReadValue(std::get<k>(tp), val);
 		}
 		else
 		{
@@ -139,12 +138,12 @@ private:
 	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
 	{
 		using U = typename std::decay<T>::type;
-		//Value& arr = v[size_t(0)];
+
 		size_t sz = v.Size();
 		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
-			ReadValue(value, v[i], i);
+			ReadValue(value, v[i]);
 			push(t, value);
 		}
 	}
@@ -172,15 +171,16 @@ private:
 	{
 		using U = typename std::decay<T>::type;
 
-		size_t sz = v.Size();
-		for (SizeType i = 0; i < sz; i++)
+		for (rapidjson::Value::ConstMemberIterator it = v.MemberBegin(); it != v.MemberEnd(); it++)
 		{
-			Value& element = v[i];
+			using key_type = typename U::key_type;
+			using val_type = typename U::value_type::second_type;
+			key_type key;
+			val_type value;
 
-			typename U::key_type key;
-			typename U::value_type::second_type value;
-			ReadValue(key, element["0"], i); //key
-			ReadObject(value, element["1"]); //value
+			key = boost::lexical_cast<key_type>(it->name.GetString());
+
+			ReadObject(value, (Value&)it->value); 
 
 			t.emplace(key, value);
 		}
@@ -189,36 +189,20 @@ private:
 	template<typename T>
 	typename std::enable_if<is_basic_type<T>::value>::type ReadObject(T&& t, Value& v)
 	{
-		m_jsutil.ReadValue(std::forward<T>(t), v[0]);
+		m_jsutil.ReadValue(std::forward<T>(t), v);
 	}
 
 	template<typename T>
-	typename std::enable_if<is_normal_class<T>::value>::type ReadValue(T&& t, Value& val, std::size_t M)
+	typename std::enable_if<is_normal_class<T>::value>::type ReadValue(T&& t, Value& val)
 	{
-		Value& p = val[Int2String[M]];
-		ReadObject(t, p);
+		Value& p = val[t.first.c_str()];
+		m_jsutil.ReadValue(t.second, p);
 	}
 
 	template<typename T>
-	typename std::enable_if<is_basic_type<T>::value>::type ReadValue(T&& t, Value& val, std::size_t M)
+	typename std::enable_if<is_basic_type<T>::value>::type ReadValue(T&& t, Value& val)
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), val);
-	}
-
-	template<typename T, size_t N>
-	void ReadValue(T(&t)[N], Value& val, std::size_t M)
-	{
-		Value& p = val[Int2String[M]];
-
-		ReadArray<T>(t, p);
-	}
-
-	template<typename T, size_t N>
-	void ReadValue(std::array<T,N>& t, Value& val, std::size_t M)
-	{
-		Value& p = val[Int2String[M]];
-
-		ReadArray<T>(t, p);
 	}
 
 private:
