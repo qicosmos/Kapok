@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <iostream>
 #include "kapok/Kapok.hpp"
+#include <boost/timer.hpp>
 
 void test()
 {
@@ -106,8 +107,33 @@ void test_new_meta()
 	dr.Deserialize(de_t, "test");
 }
 
+void test_performance()
+{
+	person p = { 20, "test" };
+	Serializer sr;
+	
+	const int LEN = 1000000;
+	boost::timer timer;
+	for (size_t i = 0; i < LEN; i++)
+	{
+		sr.Serialize(p, "test");
+	}
+	std::cout << timer.elapsed() << std::endl;
+	
+	DeSerializer dr;
+	timer.restart();
+	for (size_t i = 0; i < LEN; i++)
+	{
+		dr.Parse(sr.GetString());
+		person de_t;
+		dr.Deserialize(de_t, "test");
+	}
+	std::cout << timer.elapsed() << std::endl;
+}
+
 int main()
 {
+	//test_performance();
 	test_new_meta();
 
 	std::array<std::string, 5> arr = { "a","b","c", "d", "e" };
