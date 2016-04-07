@@ -153,12 +153,6 @@ private:
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
 
-	template <unsigned N, typename T>
-	void WriteValue(T(&p)[N], std::size_t M)
-	{
-		SerializeImpl(p, Int2String[M]);
-	}
-
 private:
 	JsonUtil m_jsutil;
 };

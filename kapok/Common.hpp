@@ -22,14 +22,14 @@ std::array<std::string, N> split(const std::string& s, const char delimiter)
 	return output;
 }
 
-template<unsigned N, typename T>
-constexpr static inline auto make(const std::array<std::string, N>&ar, unsigned index, T& args)
+template <size_t N, typename T, typename T1>
+static inline auto make(const std::array<std::string, N>&ar, unsigned index, T const & t, T1& args)
 {
-	return args;
+	return std::tuple_cat(t, std::make_tuple(std::pair<std::string, T1&>(ar[index], args)));
 }
 
-template<unsigned N, typename T, typename T1, typename... Args>
-constexpr static inline auto make(const std::array<std::string, N>&ar, unsigned index, T const & t, T1& first, Args&... args)
+template <size_t N, typename T, typename T1, typename... Args>
+static inline auto make(const std::array<std::string, N>&ar, unsigned index, T const & t, T1& first, Args&... args)
 {
 	return make(ar, index + 1, std::tuple_cat(t, std::make_tuple(std::pair<std::string, T1&>(ar[index], first))), args...);
 }
