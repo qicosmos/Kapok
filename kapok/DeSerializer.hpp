@@ -196,7 +196,7 @@ private:
 	typename std::enable_if<is_normal_class<T>::value>::type ReadValue(T&& t, Value& val)
 	{
 		Value& p = val[t.first.c_str()];
-		m_jsutil.ReadValue(t.second, p);
+		ReadObject(t.second, p);
 	}
 
 	template<typename T>

@@ -73,18 +73,19 @@ void test_object(T& t)
 struct test_p
 {
 	int a;
-	int b;
-	META(a, b);
-	
-	std::tuple<std::pair<int&, int&>> get()
-	{
-		return std::make_tuple(std::pair<int&, int&>( a,b ) );
-	}
+	std::string b;
+	std::map<std::string, int> c;
+	person d;
+	META(a, b, c, d);
+
 };
 
 void test_new_meta()
 {
-	person p = { 20, "test" };
+	std::map<std::string, int> mp = { {"aa", 2} };
+	test_p p = { 20, "test", {{ "aa", 2 }}, {12, "td"} };
+
+	//person p = { 20, "test" };
 
 	Serializer sr;
 	sr.Serialize(p, "test");
@@ -93,7 +94,7 @@ void test_new_meta()
 
 	DeSerializer dr;
 	dr.Parse(sr.GetString());
-	person de_t;
+	test_p de_t;
 	dr.Deserialize(de_t, "test");
 }
 
