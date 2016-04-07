@@ -85,16 +85,6 @@ struct test_p
 void test_new_meta()
 {
 	person p = { 20, "test" };
-	test_p p1 = { 1,2 };
-
-	test_p pp = {};
-	auto& tp1 = pp.get();
-
-	std::get<0>(tp1).first = 21;
-	std::get<0>(tp1).second = 12;
-
-	std::cout << typeid(tp1).name() << std::endl;
-	std::cout << typeid(p1.Meta()).name() << std::endl;
 
 	Serializer sr;
 	sr.Serialize(p, "test");
