@@ -144,24 +144,44 @@ private:
 		{
 			typename U::value_type value;
 			ReadObject(value, v[i]);
-			push(t, value);
+			push(t, value, i);
+		}
+	}
+
+	template<typename T>
+	typename std::enable_if<std::is_array<T>::value||is_std_array<T>::value>::type ReadObject(T&& t, Value& v)
+	{
+		using U = typename std::decay<T>::type;
+
+		size_t sz = v.Size();
+		for (SizeType i = 0; i < sz; i++)
+		{
+			typename U::value_type value;
+			ReadObject(value, v[i]);
+			t[i] = value;
 		}
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_singlevalue_container<T>::value&&!is_set<T>::value&&!is_multiset<T>::value&&!is_unordered_set<T>::value>::type push(T& t, value_type& v)
+	typename std::enable_if<is_singlevalue_container<T>::value&&!is_set<T>::value&&!is_multiset<T>::value&&!is_unordered_set<T>::value>::type push(T& t, value_type& v, std::size_t index)
 	{
 		t.push_back(v);
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_set<T>::value||is_multiset<T>::value|| is_unordered_set<T>::value>::type push(T& t, value_type& v)
+	typename std::enable_if<is_set<T>::value||is_multiset<T>::value|| is_unordered_set<T>::value>::type push(T& t, value_type& v, std::size_t index)
 	{
 		t.insert(v);
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_container_adapter<T>::value>::type push(T& t, value_type& v)
+	typename std::enable_if<is_std_array<T>::value || std::is_array<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	{
+		t[index] = v;
+	}
+
+	template<typename T, typename value_type>
+	typename std::enable_if<is_container_adapter<T>::value>::type push(T& t, value_type& v, std::size_t index)
 	{
 		t.push(v);
 	}

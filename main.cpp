@@ -91,6 +91,29 @@ struct complex_t
 
 };
 
+struct complex_t1
+{
+	int a;
+	std::map<std::string, std::array<person, 2>> d;
+
+	META(a, d);
+
+};
+
+void test_recurse1()
+{
+	complex_t1 cpl = { 1,{ { { "d",{ { { 20, "tom" },{ 20, "tom" } } } } } } };
+	Serializer sr;
+	sr.Serialize(cpl, "test");
+	std::string str = sr.GetString();
+	std::cout << str << std::endl;
+
+	DeSerializer dr;
+	dr.Parse(sr.GetString());
+	complex_t1 de_t;
+	dr.Deserialize(de_t, "test");
+}
+
 void test_recurse()
 {
 	complex_t cpl = { 1,"b", {{"c", {20, "tom"}}}, /*{{"d", {{{20, "tom"},{ 20, "tom" } }}}}, */{ { { "d",{ { { 20, "tom" },{ 20, "tom" } } } } } } };
@@ -150,6 +173,7 @@ void test_performance()
 int main()
 {
 	//test_performance();
+	test_recurse1();
 	test_recurse();
 	test_new_meta();
 
