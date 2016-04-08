@@ -53,8 +53,8 @@ struct person
 {
 	int age;
 	std::string name;
+	//META(age, name);
 	META(age, name);
-
 };
 
 template<class T>
@@ -160,10 +160,10 @@ void test_performance()
 	std::cout << timer.elapsed() << std::endl;
 	
 	DeSerializer dr;
+	dr.Parse(sr.GetString());
 	timer.restart();
 	for (size_t i = 0; i < LEN; i++)
 	{
-		dr.Parse(sr.GetString());
 		person de_t;
 		dr.Deserialize(de_t, "test");
 	}
@@ -172,7 +172,7 @@ void test_performance()
 
 int main()
 {
-	//test_performance();
+	test_performance();
 	test_recurse1();
 	test_recurse();
 	test_new_meta();

@@ -222,7 +222,7 @@ private:
 	template<typename T>
 	typename std::enable_if<is_pair<T>::value>::type ReadValue(T&& t, Value& val)
 	{
-		Value& p = val[t.first.c_str()];
+		Value& p = val[t.first/*.c_str()*/];
 		ReadObject(t.second, p);
 	}
 
