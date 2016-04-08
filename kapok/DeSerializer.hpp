@@ -143,7 +143,7 @@ private:
 		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
-			ReadValue(value, v[i]);
+			ReadObject(value, v[i]);
 			push(t, value);
 		}
 	}
@@ -193,7 +193,14 @@ private:
 	}
 
 	template<typename T>
-	typename std::enable_if<is_normal_class<T>::value>::type ReadValue(T&& t, Value& val)
+	typename std::enable_if<is_user_class<T>::value>::type ReadValue(T&& t, Value& val)
+	{
+		//Value& p = val[t.first.c_str()];
+		ReadObject(t, val);
+	}
+
+	template<typename T>
+	typename std::enable_if<is_pair<T>::value>::type ReadValue(T&& t, Value& val)
 	{
 		Value& p = val[t.first.c_str()];
 		ReadObject(t.second, p);

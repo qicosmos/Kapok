@@ -80,6 +80,31 @@ struct test_p
 
 };
 
+struct complex_t
+{
+	int a;
+	std::string b;
+	std::map<std::string, person> c;
+	std::map<std::string, std::vector<person>> d;
+	std::vector<std::map<std::string, std::vector<person>>> e;
+	META(a, b, c, d, e);
+
+};
+
+void test_recurse()
+{
+	complex_t cpl = { 1,"b", {{"c", {20, "tom"}}}, /*{{"d", {{{20, "tom"},{ 20, "tom" } }}}}, */{ { { "d",{ { { 20, "tom" },{ 20, "tom" } } } } } } };
+	Serializer sr;
+	sr.Serialize(cpl, "test");
+	std::string str = sr.GetString();
+	std::cout << str << std::endl;
+
+	DeSerializer dr;
+	dr.Parse(sr.GetString());
+	complex_t de_t;
+	dr.Deserialize(de_t, "test");
+}
+
 void test_new_meta()
 {
 	std::map<std::string, int> mp = { {"aa", 2} };
@@ -125,6 +150,7 @@ void test_performance()
 int main()
 {
 	//test_performance();
+	test_recurse();
 	test_new_meta();
 
 	std::array<std::string, 5> arr = { "a","b","c", "d", "e" };

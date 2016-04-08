@@ -134,6 +134,7 @@ template<typename T> struct is_set : is_specialization_of<detail::decay_t<T>, st
 template<typename T> struct is_multiset : is_specialization_of<detail::decay_t<T>, std::multiset> {};
 template<typename T> struct is_unordered_set : is_specialization_of<detail::decay_t<T>, std::unordered_set> {};
 template<typename T> struct is_priority_queue : is_specialization_of<detail::decay_t<T>, std::priority_queue>{};
+template<typename T> struct is_pair : is_specialization_of<detail::decay_t<T>, std::pair> {};
 
 //#define IS_TEMPLATE_CLASS(token)
 //template<typename T> struct is_##token : is_specialization_of<detail::decay_t<T>, std::token##>{}; 
@@ -149,5 +150,5 @@ struct is_container_adapter : std::integral_constant<bool, is_queue<T>::value ||
 };
 
 template<typename T>
-struct is_user_class : std::integral_constant<bool, is_normal_class<T>::value&&!is_container_adapter<T>::value&&!is_container<T>::value&&!is_tuple<T>::value>
+struct is_user_class : std::integral_constant<bool, is_normal_class<T>::value&&!is_container_adapter<T>::value&&!is_container<T>::value&&!is_tuple<T>::value&&!is_pair<T>::value>
 {};

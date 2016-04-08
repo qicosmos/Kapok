@@ -123,7 +123,7 @@ private:
 		m_jsutil.StartArray();
 		for (auto i : v)
 		{
-			WriteValue(i);
+			WriteObject(i);
 		}
 		m_jsutil.EndArray();
 	}
@@ -137,7 +137,7 @@ private:
 	template<typename T>
 	typename std::enable_if<is_normal_class<T>::value>::type WriteValue(T&& t)
 	{
-		WriteKV(t.first.c_str(), t.second);
+		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
 	}
 
 	template<typename V>
