@@ -172,7 +172,7 @@ void test_performance()
 
 int main()
 {
-	test_performance();
+//	test_performance();
 	test_recurse1();
 	test_recurse();
 	test_new_meta();
