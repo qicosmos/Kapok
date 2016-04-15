@@ -93,12 +93,12 @@ private:
 	}
 
 	template<std::size_t I = 0, typename Tuple>
-	typename std::enable_if<I == std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
+	typename std::enable_if<I == std::tuple_size<Tuple>::value>::type WriteTuple( Tuple& t)
 	{
 	}
 
 	template<std::size_t I = 0, typename Tuple>
-	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
+	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple( Tuple& t)
 	{
 		WriteObject(std::get<I>(t));
 		WriteTuple<I + 1>(t);
