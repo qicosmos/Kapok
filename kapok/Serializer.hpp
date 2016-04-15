@@ -1,4 +1,8 @@
 #pragma once
+#include <typeinfo>
+#ifndef _MSC_VER
+#include <cxxabi.h>
+#endif
 #include "traits.hpp"
 #include "Common.hpp"
 #include "JsonUtil.hpp"
@@ -22,9 +26,14 @@ public:
 	}
 
 	template<typename T>
-	void Serialize(T&& t, const char* key)
+	void Serialize(T&& t, const char* key = nullptr)
 	{	
 		m_jsutil.Reset();
+		if (key == nullptr)
+		{
+			key = get_type_name<T>();
+		}
+
 		SerializeImpl(std::forward<T>(t), key);
 	}
 
@@ -39,6 +48,35 @@ private:
 	}
 
 	template<typename T>
+	const char* type_name()
+	{
+#ifndef _MSC_VER
+		return abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+#else
+		return typeid(T).name();
+#endif
+	}
+
+	template<typename T>
+	const char* get_type_name()
+	{
+		const char* name = type_name<T>();
+		return has_space(name) ? "temp" : type_name<T>();
+	}
+
+	bool has_space(const char* str)
+	{
+		const size_t len = strlen(str);
+		for (size_t i = 0; i < len; i++)
+		{
+			if (str[i] == ' ')
+				return true;
+		}
+
+		return false;
+	}
+
+	template<typename T>
 	typename std::enable_if<is_user_class<T>::value>::type WriteObject(T&& t)
 	{
 		m_jsutil.StartObject();
@@ -49,7 +87,9 @@ private:
 	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type WriteObject(T&& t)
 	{
+		m_jsutil.StartArray();
 		WriteTuple(t);
+		m_jsutil.EndArray();
 	}
 
 	template<std::size_t I = 0, typename Tuple>
@@ -60,7 +100,7 @@ private:
 	template<std::size_t I = 0, typename Tuple>
 	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
 	{
-		WriteValue(std::get<I>(t));
+		WriteObject(std::get<I>(t));
 		WriteTuple<I + 1>(t);
 	}
 
@@ -103,6 +143,12 @@ private:
 			WriteKV(boost::lexical_cast<std::string>(pair.first).c_str(), pair.second);
 		}
 		m_jsutil.EndObject();
+	}
+
+	template<typename T>
+	typename std::enable_if<is_pair<T>::value>::type WriteObject(T&& t)
+	{
+		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
 	}
 
 	template<typename T, size_t N>

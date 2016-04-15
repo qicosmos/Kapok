@@ -170,9 +170,50 @@ void test_performance()
 	std::cout << timer.elapsed() << std::endl;
 }
 
+void test_tuple()
+{
+	using namespace std;
+	cout << is_basic_type<int>::value << endl;
+	cout << is_normal_class<int>::value << endl;
+	std::vector<int> v = { 1,2,3 };
+	std::tuple<vector<int>, int> tp = std::make_tuple(v, 2);
+	std::map<int, int> mp = { {1,2},{3,4} };
+	Serializer sr;
+	sr.Serialize(tp);
+	std::cout << sr.GetString() << std::endl;
+
+	DeSerializer dr;
+	dr.Parse(sr.GetString());
+	std::tuple<vector<int>, int> tp1;
+	std::map<int, int> mp1;
+	dr.Deserialize(tp1);
+}
+
+struct my_person
+{
+	std::vector<int> a;
+	int b;
+	META(a, b);
+};
+
+void test_myperson()
+{
+	my_person p = { {1,2,3}, 4 };
+	Serializer sr;
+	sr.Serialize(p);
+	std::cout << sr.GetString() << endl;
+
+	DeSerializer dr;
+	dr.Parse(sr.GetString());
+	my_person p1;
+	dr.Deserialize(p1);
+}
+
 int main()
 {
+	test_myperson();
 //	test_performance();
+	test_tuple();
 	test_recurse1();
 	test_recurse();
 	test_new_meta();

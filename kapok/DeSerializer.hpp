@@ -50,6 +50,14 @@ public:
 		ReadObject(t, jsonval);
 	}
 
+	template<typename T>
+	void Deserialize(T& t)
+	{
+		Value& jsonval = GetRootValue(nullptr);
+
+		ReadObject(t, jsonval);
+	}
+
 	template <typename T, size_t N>
 	void Deserialize(T(&p)[N], const char* key)
 	{
@@ -63,9 +71,15 @@ public:
 	}
 
 private:
-        Value& GetRootValue(const char* key)
+    Value& GetRootValue(const char* key)
 	{
 		Document& doc = m_jsutil.GetDocument();
+		if (key == nullptr)
+		{
+			auto it = doc.MemberBegin();
+			return (Value&)it->value;
+		}
+			
 		if (!doc.HasMember(key))
 			throw std::invalid_argument("the key is not exist");
 
@@ -126,7 +140,7 @@ private:
 	{
 		if (k == index)
 		{
-			ReadValue(std::get<k>(tp), val);
+			ReadValue<k>(tp, val);
 		}
 		else
 		{
@@ -212,24 +226,39 @@ private:
 		m_jsutil.ReadValue(std::forward<T>(t), v);
 	}
 
-	template<typename T>
+	template<size_t N=0, typename T>
 	typename std::enable_if<is_user_class<T>::value>::type ReadValue(T&& t, Value& val)
 	{
 		//Value& p = val[t.first.c_str()];
 		ReadObject(t, val);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_pair<T>::value>::type ReadValue(T&& t, Value& val)
+	template<size_t N = 0, typename T>
+	typename std::enable_if<is_pair<T>::value>::type ReadObject(T&& t, Value& val)
 	{
-		Value& p = val[t.first/*.c_str()*/];
-		ReadObject(t.second, p);
+		using val_type = decltype(t.second);
+		//Value& p = val[t.first/*.c_str()*/];
+		ReadObject(t.second, val);
 	}
 
-	template<typename T>
+	template<size_t N = 0, typename T>
 	typename std::enable_if<is_basic_type<T>::value>::type ReadValue(T&& t, Value& val)
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), val);
+	}
+
+	template<size_t N = 0, typename T>
+	typename std::enable_if<is_tuple<T>::value>::type ReadValue(T&& t, Value& val)
+	{
+		if (val.IsArray())
+		{
+			ReadObject(std::get<N>(t), val[N]);
+		}
+		else
+		{
+			auto it = val.MemberBegin() + N;
+			ReadObject(std::get<N>(t), (Value&)(it->value));
+		}
 	}
 
 private:
