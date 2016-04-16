@@ -180,6 +180,11 @@ private:
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
 
+	void WriteObject(const char* t)
+	{
+		m_jsutil.WriteValue(t);
+	}
+
 	template<typename T>
 	typename std::enable_if<is_normal_class<T>::value>::type WriteValue(T&& t)
 	{

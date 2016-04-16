@@ -37,23 +37,23 @@ public:
 	}
 	
 	template<typename T>
-	void Deserialize(T& t, const string& key)
+	void Deserialize(T& t, const string& key, bool has_root = true)
 	{
-		Deserialize(t, key.c_str());
+		Deserialize(t, key.c_str(), has_root);
 	}
 
 	template<typename T>
-	void Deserialize(T& t, const char* key)
+	void Deserialize(T& t, const char* key, bool has_root = true)
 	{
-		Value& jsonval = GetRootValue(key);
+		Value& jsonval = GetRootValue(key, has_root);
 
 		ReadObject(t, jsonval);
 	}
 
 	template<typename T>
-	void Deserialize(T& t)
+	void Deserialize(T& t, bool has_root = true)
 	{
-		Value& jsonval = GetRootValue(nullptr);
+		Value& jsonval = GetRootValue(nullptr, has_root);
 
 		ReadObject(t, jsonval);
 	}
@@ -71,9 +71,12 @@ public:
 	}
 
 private:
-    Value& GetRootValue(const char* key)
+    Value& GetRootValue(const char* key, bool has_root)
 	{
 		Document& doc = m_jsutil.GetDocument();
+		if (!has_root)
+			return doc;
+
 		if (key == nullptr)
 		{
 			auto it = doc.MemberBegin();
@@ -236,8 +239,6 @@ private:
 	template<size_t N = 0, typename T>
 	typename std::enable_if<is_pair<T>::value>::type ReadObject(T&& t, Value& val)
 	{
-		using val_type = decltype(t.second);
-		//Value& p = val[t.first/*.c_str()*/];
 		ReadObject(t.second, val);
 	}
 
