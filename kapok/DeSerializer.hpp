@@ -71,7 +71,7 @@ public:
 	}
 
 private:
-    Value& GetRootValue(const char* key, bool has_root)
+    Value& GetRootValue(const char* key, bool has_root = true)
 	{
 		Document& doc = m_jsutil.GetDocument();
 		if (!has_root)
