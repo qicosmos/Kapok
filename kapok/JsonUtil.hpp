@@ -83,7 +83,11 @@ public:
 
 	void Parse(const char* json)
 	{
-		m_doc.Parse<0>(json);
+		auto& r = m_doc.Parse<0>(json);
+		if (r.HasParseError())
+		{
+			throw std::invalid_argument("json string parse failed");
+		}
 	}
 
 	Document& GetDocument()

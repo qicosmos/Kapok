@@ -209,8 +209,37 @@ void test_myperson()
 	dr.Deserialize(p1);
 }
 
+struct T
+{
+	int a;
+	char b;
+	META(a, b);
+};
+
+void test_simple()
+{
+	Serializer sr;
+	sr.Serialize((std::array<int, 5>{1, 2, 3, 4, 5}));
+	std::cout << sr.GetString() << std::endl;
+
+	T t{ 66, 'c' };
+	sr.Serialize(t, "T");
+	std::cout << sr.GetString() << std::endl;
+}
+
+void test_array()
+{
+	DeSerializer dr;
+	dr.Parse(R"({"array":[1,2,3,4,5]})");
+	std::array<int, 5> v;
+	std::array<int, 5> a{ 1, 2, 3, 4, 5 };
+	dr.Deserialize(v, "array");
+}
+
 int main()
 {
+	test_array();
+	test_simple();
 	test_myperson();
 //	test_performance();
 	test_tuple();
