@@ -153,10 +153,10 @@ template<typename T> struct is_pair : is_specialization_of<detail::decay_t<T>, s
 //IS_TEMPLATE_CLASS(priority_queue)
 
 template<typename T>
-struct is_container_adapter : std::integral_constant<bool, is_queue<T>::value || is_stack<T>::value || is_priority_queue<T>::value>
+struct is_container_adapter : std::integral_constant<bool, is_queue<T>::value || is_priority_queue<T>::value>
 {
 };
 
 template<typename T>
-struct is_user_class : std::integral_constant<bool, is_normal_class<T>::value&&!is_container_adapter<T>::value&&!is_container<T>::value&&!is_tuple<T>::value&&!is_pair<T>::value>
+struct is_user_class : std::integral_constant<bool, is_normal_class<T>::value&&!is_container_adapter<T>::value&&!is_stack<T>::value&&!is_container<T>::value&&!is_tuple<T>::value&&!is_pair<T>::value>
 {};

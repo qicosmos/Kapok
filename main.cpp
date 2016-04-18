@@ -243,8 +243,32 @@ void test_const(const person& p)
 	std::cout << sr.GetString() << std::endl;
 }
 
+void test_stack()
+{
+	DeSerializer dr;
+	dr.Parse(R"({"stack":[1,2,3,4,5]})");
+	std::stack<int> v;
+	dr.Deserialize(v, "stack");
+
+	for (int i = 0; i < 5; ++i)
+	{
+		if(v.top()==i+1)
+		std::cout << "ok" << std::endl;
+		v.pop();
+	}
+}
+
+void test_str()
+{
+	Serializer sr;
+	sr.Serialize("hello, world", "string value");
+	std::cout << sr.GetString() << std::endl;
+}
+
 int main()
 {
+	test_str();
+	test_stack();
 	person p1 = { 20, "aa" };
 	test_const(p1);
 	test_array();

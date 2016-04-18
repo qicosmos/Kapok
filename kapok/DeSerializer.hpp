@@ -152,6 +152,20 @@ private:
 	}
 
 	template<typename T>
+	typename std::enable_if<is_stack<T>::value>::type ReadObject(T&& t, Value& v)
+	{
+		using U = typename std::decay<T>::type;
+
+		size_t sz = v.Size();
+		for (SizeType i = sz; i > 0; i--)
+		{
+			typename U::value_type value;
+			ReadObject(value, v[i-1]);
+			push(t, value, i-1);
+		}
+	}
+
+	template<typename T>
 	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
 	{
 		using U = typename std::decay<T>::type;
@@ -198,7 +212,7 @@ private:
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_container_adapter<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	typename std::enable_if<is_container_adapter<T>::value||is_stack<T>::value>::type push(T& t, value_type& v, std::size_t index)
 	{
 		t.push(v);
 	}

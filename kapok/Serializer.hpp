@@ -183,6 +183,12 @@ private:
 		WriteArray(p);
 	}
 
+	template <size_t N>
+	void WriteObject(char(&p)[N])
+	{
+		WriteObject((const char*)p);
+	}
+
 	template<typename Array>
 	inline void WriteArray(Array& v)
 	{
