@@ -236,8 +236,17 @@ void test_array()
 	dr.Deserialize(v, "array");
 }
 
+void test_const(const person& p)
+{
+	Serializer sr;
+	sr.Serialize(p);
+	std::cout << sr.GetString() << std::endl;
+}
+
 int main()
 {
+	person p1 = { 20, "aa" };
+	test_const(p1);
 	test_array();
 	test_simple();
 	test_myperson();
