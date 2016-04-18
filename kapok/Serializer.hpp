@@ -37,6 +37,18 @@ public:
 		SerializeImpl(std::forward<T>(t), key);
 	}
 
+	template<typename T>
+	void Serialize(const T& t, const char* key = nullptr)
+	{
+		m_jsutil.Reset();
+		if (key == nullptr)
+		{
+			key = get_type_name<T>();
+		}
+
+		SerializeImpl((T&)t, key);
+	}
+
 private:
 	template<typename T>
 	void SerializeImpl(T&& t, const char* key)
