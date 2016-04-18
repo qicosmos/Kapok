@@ -34,7 +34,7 @@ public:
 			key = get_type_name<T>();
 		}
 
-		SerializeImpl(std::forward<T>(t), key);
+		SerializeImpl(t, key);
 	}
 
 	template<typename T>
