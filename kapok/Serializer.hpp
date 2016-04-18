@@ -55,7 +55,7 @@ private:
 	{
 		m_jsutil.StartObject();
 		m_jsutil.WriteValue(key);
-		WriteObject(std::forward<T>(t));
+		WriteObject(t);
 		m_jsutil.EndObject();
 	}
 
@@ -93,6 +93,14 @@ private:
 	{
 		m_jsutil.StartObject();
 		WriteTuple(t.Meta());
+		m_jsutil.EndObject();
+	}
+
+	template<typename T>
+	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t)
+	{
+		m_jsutil.StartObject();
+		WriteTuple(((T&)t).Meta());
 		m_jsutil.EndObject();
 	}
 
