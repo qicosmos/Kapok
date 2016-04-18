@@ -3,6 +3,7 @@ SET(TEST_SOURCES
     primitive.cpp
     stl.cpp
     user.cpp
+    panic.cpp
 )
 
 INCLUDE_DIRECTORIES(..)

@@ -3,14 +3,12 @@
 #include <map>
 #include <unordered_map>
 
-/*
 TEST_CASE(string_serialize)
 {
     Serializer sr;
     sr.Serialize("hello, world", "string value");
-    TEST_CHECK(sr.GetString() == std::string(R"({"string value":"hello, world"})"));    //FIXME: failed
+    TEST_CHECK(sr.GetString() == std::string(R"({"string value":"hello, world"})"));  
 }
-*/
 
 TEST_CASE(string_deserialize)
 {
@@ -82,7 +80,7 @@ TEST_CASE(stack_serialize)
     sr.Serialize(q, "stack");
     TEST_CHECK(sr.GetString() == std::string(R"({"stack":[1,2,3,4,5]})"));
 }
-/*
+
 TEST_CASE(stack_deserialize)
 {
     DeSerializer dr;
@@ -91,11 +89,11 @@ TEST_CASE(stack_deserialize)
     dr.Deserialize(v, "stack");
     for(int i = 0; i < 5; ++i)
     {
-        TEST_CHECK(v.top() == i + 1);           //FIXME: 这里栈的顺序被反转了
+        TEST_CHECK(v.top() == i + 1); 
         v.pop();
     }
 }
-*/
+
 TEST_CASE(set_serialize)
 {
     Serializer sr;
