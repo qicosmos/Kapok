@@ -34,7 +34,19 @@ public:
 			key = get_type_name<T>();
 		}
 
-		SerializeImpl(std::forward<T>(t), key);
+		SerializeImpl(t, key);
+	}
+
+	template<typename T>
+	void Serialize(const T& t, const char* key = nullptr)
+	{
+		m_jsutil.Reset();
+		if (key == nullptr)
+		{
+			key = get_type_name<T>();
+		}
+
+		SerializeImpl((T&)t, key);
 	}
 
 private:
@@ -43,7 +55,7 @@ private:
 	{
 		m_jsutil.StartObject();
 		m_jsutil.WriteValue(key);
-		WriteObject(std::forward<T>(t));
+		WriteObject(t);
 		m_jsutil.EndObject();
 	}
 
@@ -85,6 +97,14 @@ private:
 	}
 
 	template<typename T>
+	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t)
+	{
+		m_jsutil.StartObject();
+		WriteTuple(((T&)t).Meta());
+		m_jsutil.EndObject();
+	}
+
+	template<typename T>
 	typename std::enable_if<is_tuple<T>::value>::type WriteObject(T&& t)
 	{
 		m_jsutil.StartArray();
@@ -93,12 +113,12 @@ private:
 	}
 
 	template<std::size_t I = 0, typename Tuple>
-	typename std::enable_if<I == std::tuple_size<Tuple>::value>::type WriteTuple( Tuple& t)
+	typename std::enable_if<I == std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
 	{
 	}
 
 	template<std::size_t I = 0, typename Tuple>
-	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple( Tuple& t)
+	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
 	{
 		WriteObject(std::get<I>(t));
 		WriteTuple<I + 1>(t);
