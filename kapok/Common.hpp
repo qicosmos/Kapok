@@ -36,10 +36,12 @@ static inline auto make(const std::array<std::string, N>&ar, unsigned index, T c
 
 #define VA_ARGS_NUM(...) std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value
 
-//#define META(...) auto Meta(){\
-//	auto ar = split<VA_ARGS_NUM(__VA_ARGS__)>(#__VA_ARGS__, ',');\
-//	return make(ar, 0, std::tuple<>(), __VA_ARGS__);\
-//}
+/*
+#define META(...) auto Meta(){\
+	auto ar = split<VA_ARGS_NUM(__VA_ARGS__)>(#__VA_ARGS__, ',');\
+	return make(ar, 0, std::tuple<>(), __VA_ARGS__);\
+}
+*/
 
 /******************************************/
 #define MARCO_EXPAND(...)                 __VA_ARGS__
