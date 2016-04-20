@@ -20,6 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\main.cpp" />
+    <ClCompile Include="..\..\test\panic.cpp" />
+    <ClCompile Include="..\..\test\primitive.cpp" />
+    <ClCompile Include="..\..\test\stl.cpp" />
+    <ClCompile Include="..\..\test\user.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\test_kapok.hpp" />
