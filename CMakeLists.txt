@@ -20,6 +20,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 set(SOURCE_FILES 
 	main.cpp
+		test/panic.cpp
+		test/primitive.cpp
+		test/stl.cpp
+		test/user.cpp
 	)
 
 
