@@ -10,6 +10,7 @@
 #include <iostream>
 #include "kapok/Kapok.hpp"
 #include <boost/timer.hpp>
+#include "test_kapok.hpp"
 
 void test()
 {
@@ -265,7 +266,7 @@ void test_str()
 	std::cout << sr.GetString() << std::endl;
 }
 
-int main()
+TEST_CASE(example)
 {
 	test_str();
 	test_stack();
@@ -340,5 +341,4 @@ int main()
 
 	std::map<std::string, person> map2= { {"a", p} };
 	test_map(map2);
-	return 0;
 }

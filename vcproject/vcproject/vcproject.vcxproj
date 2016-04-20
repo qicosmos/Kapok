@@ -21,6 +21,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test_kapok.hpp" />
+    <ClInclude Include="..\..\unit_test.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6302160B-5BCE-442B-B7F6-15972074585E}</ProjectGuid>
     <RootNamespace>vcproject</RootNamespace>
