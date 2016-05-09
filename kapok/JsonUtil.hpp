@@ -90,6 +90,15 @@ public:
 		}
 	}
 
+	void Parse(const char* json, std::size_t length)
+	{
+		auto& r = m_doc.Parse<0>(json, length);
+		if (r.HasParseError())
+		{
+			throw std::invalid_argument("json string parse failed");
+		}
+	}
+
 	Document& GetDocument()
 	{
 		return m_doc;

@@ -7,9 +7,9 @@ class DeSerializer : NonCopyable
 {
 public:
 	DeSerializer() = default;
-	DeSerializer(const char* jsonText)
+	DeSerializer(const char* jsonText, std::size_t length)
 	{
-		Parse(jsonText);
+		Parse(jsonText, length);
 	}
 	
 	DeSerializer(const string& jsonText)
@@ -23,12 +23,12 @@ public:
 	
 	void Parse(const string& jsonText)
 	{
-		Parse(jsonText.c_str());
+		Parse(jsonText.c_str(), jsonText.length());
 	}
 
-	void Parse(const char* jsonText)
+	void Parse(const char* jsonText, std::size_t length)
 	{
-		m_jsutil.Parse(jsonText);
+		m_jsutil.Parse(jsonText, length);
 	}
 
 	Document&  GetDocument()
