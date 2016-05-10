@@ -210,11 +210,11 @@ public:
 		m_writer.Bool(val);
 	}
 
-	//还要过滤智能指针的情况
+	//还要过滤智能指针的情况.
 	template<typename T>
 	typename std::enable_if<is_pointer_ext<T>::value>::type WriteValue(T val)
 	{
-		//不支持动态指针的原因是反序列化的时候涉及到指针的内存管理，反序列化不应该考虑为对象分配内存
+		//不支持动态指针的原因是反序列化的时候涉及到指针的内存管理，反序列化不应该考虑为对象分配内存.
 		throw std::invalid_argument("not surpport dynamic pointer");
 	}
 
@@ -229,7 +229,7 @@ public:
 	}
 
 private:
-	StringBuffer m_buf; //json字符串的buf
-	JsonWriter m_writer; //json写入器
+	StringBuffer m_buf; //json字符串的buf.
+	JsonWriter m_writer; //json写入器.
 	Document m_doc;
 };
