@@ -51,7 +51,7 @@ public:
 	}
 
 	template<typename T>
-	void Deserialize(T& t, bool has_root = true)
+	void Deserialize(T& t, bool has_root = false)
 	{
 		Value& jsonval = GetRootValue(nullptr, has_root);
 

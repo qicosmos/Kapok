@@ -31,10 +31,12 @@ public:
 		m_jsutil.Reset();
 		if (key == nullptr)
 		{
-			key = get_type_name<T>();
+			WriteObject(t);
 		}
-
-		SerializeImpl(t, key);
+		else 
+		{
+			SerializeImpl(t, key);
+		}
 	}
 
 	template<typename T>
