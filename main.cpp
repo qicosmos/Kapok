@@ -259,6 +259,21 @@ void test_stack()
 	}
 }
 
+struct messager
+{
+	int code;
+	int id;
+	META(code, id);
+};
+
+void test_sr()
+{
+	messager m = { 1,2 };
+	Serializer sr;
+	sr.Serialize(m);
+	std::cout << sr.GetString() << std::endl;
+}
+
 void test_str()
 {
 	Serializer sr;
@@ -268,6 +283,7 @@ void test_str()
 
 TEST_CASE(example)
 {
+	test_sr();
 	test_str();
 	test_stack();
 	person p1 = { 20, "aa" };
