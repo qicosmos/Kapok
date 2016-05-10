@@ -45,10 +45,12 @@ public:
 		m_jsutil.Reset();
 		if (key == nullptr)
 		{
-			key = get_type_name<T>();
+			WriteObject(t);
 		}
-
-		SerializeImpl((T&)t, key);
+		else
+		{
+			SerializeImpl((T&)t, key);
+		}
 	}
 
 private:
