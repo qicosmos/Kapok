@@ -92,13 +92,22 @@ private:
 		return false;
 	}
 
-	template<typename T>
-	typename std::enable_if<is_user_class<T>::value>::type WriteObject(T&& t)
+	template <typename T>
+	std::enable_if_t<is_optional<T>::value> WriteObject(T const& t)
 	{
-		m_jsutil.StartObject();
-		WriteTuple(t.Meta());
-		m_jsutil.EndObject();
+		if (static_cast<bool>(t))
+		{
+			WriteObject(*t);
+		}
 	}
+
+	//template<typename T>
+	//typename std::enable_if<is_user_class<T>::value>::type WriteObject(T&& t)
+	//{
+	//	m_jsutil.StartObject();
+	//	WriteTuple(t.Meta());
+	//	m_jsutil.EndObject();
+	//}
 
 	template<typename T>
 	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t)

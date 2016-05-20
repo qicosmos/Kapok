@@ -281,6 +281,22 @@ void test_str()
 	std::cout << sr.GetString() << std::endl;
 }
 
+void test_optional()
+{
+	struct test_optional_struct
+	{
+		int a;
+		float b;
+		boost::optional<std::string> str;
+		META(a, b, str);
+	};
+
+	boost::optional<test_optional_struct> test = test_optional_struct{ 1, 1.0f, "hello optional!" };
+	Serializer sr;
+	sr.Serialize(test);
+	std::cout << sr.GetString() << std::endl;
+}
+
 TEST_CASE(example)
 {
 	test_sr();
@@ -357,4 +373,7 @@ TEST_CASE(example)
 
 	std::map<std::string, person> map2= { {"a", p} };
 	test_map(map2);
+
+
+	test_optional();
 }
