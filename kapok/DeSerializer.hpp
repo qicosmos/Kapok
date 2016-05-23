@@ -121,6 +121,17 @@ private:
 		ReadTuple(t.Meta(), val);
 	}
 
+	template <typename T>
+	auto ReadObject(T& t, Value& val) -> std::enable_if_t<is_optional<T>::value>
+	{
+		if (!val.IsNull())
+		{
+			std::remove_reference_t<decltype(*t)> tmp;
+			ReadObject(tmp, val);
+			t = tmp;
+		}
+	}
+
 	template<typename Tuple>
 	void ReadTuple(Tuple&& tp, Value& val)
 	{
@@ -243,10 +254,17 @@ private:
 		m_jsutil.ReadValue(std::forward<T>(t), v);
 	}
 
-	template<size_t N=0, typename T>
-	typename std::enable_if<is_user_class<T>::value>::type ReadValue(T&& t, Value& val)
+	//template<size_t N=0, typename T>
+	//typename std::enable_if<is_user_class<T>::value>::type ReadValue(T&& t, Value& val)
+	//{
+	//	//Value& p = val[t.first.c_str()];
+	//	ReadObject(t, val);
+	//}
+
+	template<size_t N = 0, typename T>
+	auto ReadValue(T&& t, Value& val) -> 
+		std::enable_if_t<is_optional<T>::value || is_user_class<T>::value>
 	{
-		//Value& p = val[t.first.c_str()];
 		ReadObject(t, val);
 	}
 

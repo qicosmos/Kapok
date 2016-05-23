@@ -204,6 +204,16 @@ public:
 		t = val.GetDouble();
 	}
 
+	void WriteValue(float val)
+	{
+		m_writer.Double(static_cast<double>(val));
+	}
+
+	void ReadValue(float& t, Value& val)
+	{
+		t = static_cast<float>(val.GetDouble());
+	}
+
 	template<typename T>
 	typename std::enable_if<std::is_same<T, bool>::value>::type WriteValue(T val)
 	{
@@ -216,6 +226,11 @@ public:
 	{
 		//不支持动态指针的原因是反序列化的时候涉及到指针的内存管理，反序列化不应该考虑为对象分配内存.
 		throw std::invalid_argument("not surpport dynamic pointer");
+	}
+
+	void WriteNull()
+	{
+		m_writer.Null();
 	}
 
 	void ReadValue(bool& t, Value& val)

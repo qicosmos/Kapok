@@ -291,10 +291,33 @@ void test_optional()
 		META(a, b, str);
 	};
 
-	boost::optional<test_optional_struct> test = test_optional_struct{ 1, 1.0f, "hello optional!" };
+	// init without init test_optional_struct::str
+	boost::optional<test_optional_struct> to_sr = test_optional_struct{ 1, 1.0f };
 	Serializer sr;
-	sr.Serialize(test);
+	sr.Serialize(to_sr);
 	std::cout << sr.GetString() << std::endl;
+
+	DeSerializer ds;
+	ds.Parse(sr.GetString());
+	boost::optional<test_optional_struct> to_ds;
+	ds.Deserialize(to_ds);
+	bool test_pass =
+		to_ds->a == to_sr->a &&
+		to_ds->b == to_sr->b &&
+		to_ds->str == to_sr->str;
+
+	//full init
+	to_sr = test_optional_struct{ 3, 2.0f, "hello optional" };
+	sr.Serialize(to_sr);
+	std::cout << sr.GetString() << std::endl;
+
+	ds.Parse(sr.GetString());
+	to_ds.reset();
+	ds.Deserialize(to_ds);
+	test_pass =
+		to_ds->a == to_sr->a &&
+		to_ds->b == to_sr->b &&
+		to_ds->str == to_sr->str;
 }
 
 TEST_CASE(example)

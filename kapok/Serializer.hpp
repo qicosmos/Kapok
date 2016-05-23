@@ -99,6 +99,10 @@ private:
 		{
 			WriteObject(*t);
 		}
+		else
+		{
+			m_jsutil.WriteNull();
+		}
 	}
 
 	//template<typename T>
