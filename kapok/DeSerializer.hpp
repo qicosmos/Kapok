@@ -122,6 +122,14 @@ private:
 	}
 
 	template <typename T>
+	auto ReadObject(T& t, Value& val) -> std::enable_if_t<is_enum<
+		std::remove_cv_t<std::remove_reference_t<T>>>::value>
+	{
+		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
+		ReadObject(reinterpret_cast<under_type&>(t), val);
+	}
+
+	template <typename T>
 	auto ReadObject(T& t, Value& val) -> std::enable_if_t<is_optional<T>::value>
 	{
 		if (!val.IsNull())
@@ -266,6 +274,14 @@ private:
 		std::enable_if_t<is_optional<T>::value || is_user_class<T>::value>
 	{
 		ReadObject(t, val);
+	}
+
+	template <size_t N = 0, typename T>
+	auto ReadValue(T&& t, Value& val) -> std::enable_if_t<std::is_enum<
+		std::remove_cv_t<std::remove_reference_t<T>>>::value>
+	{
+		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
+		ReadObject(std::forward<under_type>(t), val);
 	}
 
 	template<size_t N = 0, typename T>

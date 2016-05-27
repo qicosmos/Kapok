@@ -223,6 +223,15 @@ private:
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
 
+	template <typename T>
+	auto WriteObject(T&& val) ->std::enable_if_t<std::is_enum<
+		std::remove_reference_t<std::remove_cv_t<T>>>::value>
+	{
+		using under_type = std::underlying_type_t<
+			std::remove_reference_t<std::remove_cv_t<T>>>;
+		m_jsutil.WriteValue(static_cast<under_type>(val));
+	}
+
 	void WriteObject(const char* t)
 	{
 		m_jsutil.WriteValue(t);
