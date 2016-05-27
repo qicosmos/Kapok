@@ -320,6 +320,48 @@ void test_optional()
 		to_ds->str == to_sr->str;
 }
 
+enum class foo_enum
+{
+	hahahaha = 0,
+	jinkela = 1,
+};
+
+void test_enum()
+{
+	{
+		Serializer sr;
+		foo_enum aha = foo_enum::hahahaha;
+		sr.Serialize(aha);
+		std::cout << sr.GetString() << std::endl;
+		DeSerializer ds;
+		ds.Parse(sr.GetString());
+		foo_enum r;
+		ds.Deserialize(r);
+
+		assert(r == aha);
+	}
+
+	struct test_enum_t
+	{
+		foo_enum a;
+		int b;
+		META(a, b);
+	};
+	
+	{
+		Serializer sr;
+		test_enum_t foo = { foo_enum::jinkela, 8 };
+		sr.Serialize(foo);
+		std::cout << sr.GetString() << std::endl;
+		DeSerializer ds;
+		ds.Parse(sr.GetString());
+		test_enum_t r;
+		ds.Deserialize(r);
+
+		assert(r.a == foo.a && r.b == foo.b);
+	}
+}
+
 TEST_CASE(example)
 {
 	test_sr();
@@ -399,4 +441,5 @@ TEST_CASE(example)
 
 
 	test_optional();
+	test_enum();
 }
