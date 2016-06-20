@@ -152,7 +152,7 @@ void test_performance()
 	person p = { 20, "test" };
 	Serializer sr;
 	
-	const int LEN = 1000000;
+	const int LEN = 1;
 	boost::timer timer;
 	for (size_t i = 0; i < LEN; i++)
 	{
@@ -250,7 +250,7 @@ void test_stack()
 	dr.Parse(R"({"stack":[1,2,3,4,5]})");
 	std::stack<int> v;
 	dr.Deserialize(v, "stack");
-
+	
 	for (int i = 0; i < 5; ++i)
 	{
 		if(v.top()==i+1)
@@ -362,8 +362,33 @@ void test_enum()
 	}
 }
 
+void test_pair()
+{
+	struct pair_t
+	{
+		std::pair<int, double> pair;
+		META(pair);
+	};
+
+	std::pair<int, double> p = { 1, 0.2 };
+	std::pair<int, double> r;
+
+	Serializer sr;
+	sr.Serialize(p);
+	auto result = sr.GetString();
+	std::cout << result << std::endl;
+
+	//DeSerializer ds;
+	//ds.Parse(result);
+	//ds.Deserialize(r);
+
+	//assert(p.pair.first == r.pair.first && p.pair.second == r.pair.second);
+}
+
 TEST_CASE(example)
 {
+	test_pair();
+
 	test_sr();
 	test_str();
 	test_stack();
@@ -372,7 +397,7 @@ TEST_CASE(example)
 	test_array();
 	test_simple();
 	test_myperson();
-//	test_performance();
+	test_performance();
 	test_tuple();
 	test_recurse1();
 	test_recurse();
