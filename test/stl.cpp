@@ -189,6 +189,6 @@ TEST_CASE(stl_with_user_type)
     DeSerializer dr;
     dr.Parse(R"({"temp":[{"key":"k1","val":"v1"},{"key":"k2","val":"v2"},{"key":"k3","val":"v3"}]})");
     std::vector<T> v;
-    dr.Deserialize(v);
+    dr.Deserialize(v, "temp");
     TEST_CHECK(v == (std::vector<T>{{"k1", "v1"}, T{"k2", "v2"}, T{"k3", "v3"}})); 
 }
