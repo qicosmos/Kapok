@@ -307,7 +307,7 @@ void test_optional()
 		to_ds->str == to_sr->str;
 
 	//full init
-	to_sr = test_optional_struct{ 3, 2.0f, "hello optional" };
+	to_sr = test_optional_struct{ 3, 2.0f, "hello optional"s };
 	sr.Serialize(to_sr);
 	std::cout << sr.GetString() << std::endl;
 
