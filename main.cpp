@@ -364,12 +364,6 @@ void test_enum()
 
 void test_pair()
 {
-	struct pair_t
-	{
-		std::pair<int, double> pair;
-		META(pair);
-	};
-
 	std::pair<int, double> p = { 1, 0.2 };
 	std::pair<int, double> r;
 
@@ -378,11 +372,11 @@ void test_pair()
 	auto result = sr.GetString();
 	std::cout << result << std::endl;
 
-	//DeSerializer ds;
-	//ds.Parse(result);
-	//ds.Deserialize(r);
+	DeSerializer ds;
+	ds.Parse(result);
+	ds.Deserialize(r);
 
-	//assert(p.pair.first == r.pair.first && p.pair.second == r.pair.second);
+	assert(p.first == r.first && p.second == r.second);
 }
 
 TEST_CASE(example)

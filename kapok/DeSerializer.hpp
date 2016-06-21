@@ -47,7 +47,7 @@ public:
 	{
 		Value& jsonval = GetRootValue(key, has_root);
 
-		ReadObject(t, jsonval);
+		ReadObject(t, jsonval, std::true_type{});
 	}
 
 	template<typename T>
@@ -55,7 +55,7 @@ public:
 	{
 		Value& jsonval = GetRootValue(nullptr, has_root);
 
-		ReadObject(t, jsonval);
+		ReadObject(t, jsonval, std::true_type{});
 	}
 
 	template <typename T, size_t N>
@@ -104,74 +104,77 @@ private:
 		for (SizeType i = 0; i < sz; i++)
 		{
 			value_type value;
-			ReadValue(value, jsonval[i]);
+			ReadValue(value, jsonval[i], std::true_type{});
 			t[i] = value;
 		}
 	}
 
-	template<typename T>
-	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val)
+	template<typename T, typename BeginObject>
+	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val, BeginObject bo)
 	{
-		ReadTuple(std::forward<T>(t), val);
+		ReadTuple(std::forward<T>(t), val, bo);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, Value& val)
+	template<typename T, typename BeginObject>
+	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, Value& val, BeginObject)
 	{
-		ReadTuple(t.Meta(), val);
+		ReadTuple(t.Meta(), val, std::false_type{});
 	}
 
-	template <typename T>
-	auto ReadObject(T& t, Value& val) -> std::enable_if_t<is_enum<
+	template <typename T, typename BeginObject>
+	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
-		ReadObject(reinterpret_cast<under_type&>(t), val);
+		ReadObject(reinterpret_cast<under_type&>(t), val, std::true_type{});
 	}
 
-	template <typename T>
-	auto ReadObject(T& t, Value& val) -> std::enable_if_t<is_optional<T>::value>
+	template <typename T, typename BeginObject>
+	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
 	{
 		if (!val.IsNull())
 		{
 			std::remove_reference_t<decltype(*t)> tmp;
-			ReadObject(tmp, val);
+			ReadObject(tmp, val, std::true_type{});
 			t = tmp;
 		}
 	}
 
-	template<typename Tuple>
-	void ReadTuple(Tuple&& tp, Value& val)
+	template<typename Tuple, typename BeginObject>
+	void ReadTuple(Tuple&& tp, Value& val, BeginObject bo)
 	{
 		const int size = std::tuple_size<Tuple>::value;
 		
 		for (SizeType j = 0; j < size; j++)
 		{
-			SetValueByIndex(j, tp, val);
+			SetValueByIndex(j, tp, val, bo);
 		}
 	}
 
-	template<size_t k=0, typename Tuple>
-	inline typename std::enable_if < (k == std::tuple_size<Tuple>::value)>::type SetValueByIndex(size_t, Tuple&, Value&)
+	template<size_t k=0, typename Tuple, typename BeginObject>
+	inline auto SetValueByIndex(size_t, Tuple&, Value&, BeginObject) ->
+		std::enable_if_t<(k == std::tuple_size<Tuple>::value)>
 	{
 		throw std::invalid_argument("arg index out of range");
 	}
 
-	template<size_t k = 0, typename Tuple>
-	inline typename std::enable_if < (k < std::tuple_size<Tuple>::value)>::type SetValueByIndex(size_t index, Tuple& tp, Value& val)
+	template<size_t k = 0, typename Tuple, typename BeginObject>
+	inline auto SetValueByIndex(size_t index, Tuple& tp, Value& val, BeginObject bo) ->
+		std::enable_if_t<(k < std::tuple_size<Tuple>::value)>
 	{
 		if (k == index)
 		{
-			ReadValue<k>(tp, val);
+			ReadValue<k>(tp, val, bo);
 		}
 		else
 		{
-			SetValueByIndex<k + 1>(index, tp, val);
+			SetValueByIndex<k + 1>(index, tp, val, bo);
 		}
 	}
 
-	template<typename T>
-	typename std::enable_if<is_stack<T>::value>::type ReadObject(T&& t, Value& v)
+	template<typename T, typename BeginObject>
+	auto ReadObject(T&& t, Value& v, BeginObject) ->
+		std::enable_if_t<is_stack<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
@@ -179,13 +182,14 @@ private:
 		for (SizeType i = sz; i > 0; i--)
 		{
 			typename U::value_type value;
-			ReadObject(value, v[i-1]);
+			ReadObject(value, v[i - 1], std::true_type{});
 			push(t, value, i-1);
 		}
 	}
 
-	template<typename T>
-	typename std::enable_if<is_singlevalue_container<T>::value || is_container_adapter<T>::value>::type ReadObject(T&& t, Value& v)
+	template<typename T, typename BeginObject>
+	auto ReadObject(T&& t, Value& v, BeginObject) ->
+		std::enable_if_t<is_singlevalue_container<T>::value || is_container_adapter<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
@@ -193,13 +197,14 @@ private:
 		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
-			ReadObject(value, v[i]);
+			ReadObject(value, v[i], std::true_type{});
 			push(t, value, i);
 		}
 	}
 
-	template<typename T>
-	typename std::enable_if<std::is_array<T>::value||is_std_array<T>::value>::type ReadObject(T&& t, Value& v)
+	template<typename T, typename BeginObject>
+	auto ReadObject(T&& t, Value& v, BeginObject) ->
+		std::enable_if_t<std::is_array<T>::value || is_std_array<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
@@ -207,37 +212,41 @@ private:
 		for (SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
-			ReadObject(value, v[i]);
+			ReadObject(value, v[i], std::true_type{});
 			t[i] = value;
 		}
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_singlevalue_container<T>::value&&!is_set<T>::value&&!is_multiset<T>::value&&!is_unordered_set<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	auto push(T& t, value_type& v, std::size_t index) ->
+		std::enable_if_t<is_singlevalue_container<T>::value&&!is_set<T>::value&&!is_multiset<T>::value&&!is_unordered_set<T>::value>
 	{
 		t.push_back(v);
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_set<T>::value||is_multiset<T>::value|| is_unordered_set<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	auto push(T& t, value_type& v, std::size_t index) ->
+		std::enable_if_t<is_set<T>::value || is_multiset<T>::value || is_unordered_set<T>::value>
 	{
 		t.insert(v);
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_std_array<T>::value || std::is_array<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	auto push(T& t, value_type& v, std::size_t index) ->
+		std::enable_if_t<is_std_array<T>::value || std::is_array<T>::value>
 	{
 		t[index] = v;
 	}
 
 	template<typename T, typename value_type>
-	typename std::enable_if<is_container_adapter<T>::value||is_stack<T>::value>::type push(T& t, value_type& v, std::size_t index)
+	auto push(T& t, value_type& v, std::size_t index) ->
+		std::enable_if_t<is_container_adapter<T>::value || is_stack<T>::value>
 	{
 		t.push(v);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_map_container<T>::value>::type ReadObject(T&& t, Value& v)
+	template<typename T, typename BeginObject>
+	auto ReadObject(T&& t, Value& v, BeginObject) -> std::enable_if_t<is_map_container<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
@@ -250,64 +259,78 @@ private:
 
 			key = boost::lexical_cast<key_type>(it->name.GetString());
 
-			ReadObject(value, (Value&)it->value); 
+			ReadObject(value, (Value&)it->value, std::true_type {});
 
 			t.emplace(key, value);
 		}
 	}
 
-	template<typename T>
-	typename std::enable_if<is_basic_type<T>::value>::type ReadObject(T&& t, Value& v)
+	template<typename T, typename BeginObject>
+	auto ReadObject(T&& t, Value& v, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), v);
 	}
 
-	//template<size_t N=0, typename T>
-	//typename std::enable_if<is_user_class<T>::value>::type ReadValue(T&& t, Value& val)
-	//{
-	//	//Value& p = val[t.first.c_str()];
-	//	ReadObject(t, val);
-	//}
-
-	template<size_t N = 0, typename T>
-	auto ReadValue(T&& t, Value& val) -> 
-		std::enable_if_t<is_optional<T>::value || is_user_class<T>::value>
+	template<size_t N=0, typename T, typename BeginObject>
+	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_user_class<T>::value>
 	{
-		ReadObject(t, val);
+		ReadObject(t, val, std::false_type{});
 	}
 
-	template <size_t N = 0, typename T>
-	auto ReadValue(T&& t, Value& val) -> std::enable_if_t<std::is_enum<
+	template<size_t N = 0, typename T, typename BeginObject>
+	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
+	{
+		ReadObject(t, val, std::true_type{});
+	}
+
+	template <size_t N = 0, typename T, typename BeginObject>
+	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
-		ReadObject(std::forward<under_type>(t), val);
+		ReadObject(std::forward<under_type>(t), val, std::true_type{});
 	}
 
 	template<size_t N = 0, typename T>
-	typename std::enable_if<is_pair<T>::value>::type ReadObject(T&& t, Value& val)
+	auto ReadObject(T&& t, Value& val, std::true_type bo) -> std::enable_if_t<is_pair<T>::value>
 	{
-		ReadObject(t.second, val);
+		using pair_t = std::remove_cv_t<std::remove_reference_t<T>>;
+		using first_type = typename pair_t::first_type;
+		using second_type = typename pair_t::second_type;
+
+		assert(val.MemberCount() == 1);
+		auto itr = val.MemberBegin();
+		t.first = boost::lexical_cast<first_type>(itr->name.GetString());
+		ReadObject(t.second, itr->value, bo);
 	}
 
 	template<size_t N = 0, typename T>
-	typename std::enable_if<is_basic_type<T>::value>::type ReadValue(T&& t, Value& val)
+	auto ReadObject(T&& t, Value& val, std::false_type bo) -> std::enable_if_t<is_pair<T>::value>
+	{
+		ReadObject(t.second, val, bo);
+	}
+
+	template<size_t N = 0, typename T, typename BeginObject>
+	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), val);
 	}
 
 	template<size_t N = 0, typename T>
-	typename std::enable_if<is_tuple<T>::value>::type ReadValue(T&& t, Value& val)
+	auto ReadValue(T&& t, Value& val, std::false_type bo) -> std::enable_if_t<is_tuple<T>::value>
 	{
-		if (val.IsArray())
-		{
-			ReadObject(std::get<N>(t), val[N]);
-		}
-		else
-		{
-			auto it = val.MemberBegin() + N;
-			ReadObject(std::get<N>(t), (Value&)(it->value));
-		}
+		assert(!val.IsArray());
+		decltype(auto) tuple_elem = std::get<N>(t);
+		auto it = val.MemberBegin() + N;
+		assert(0 == std::strcmp(tuple_elem.first, it->name.GetString()));
+		ReadObject(tuple_elem, (Value&)(it->value), bo);
+	}
+
+	template<size_t N = 0, typename T>
+	auto ReadValue(T&& t, Value& val, std::true_type bo) -> std::enable_if_t<is_tuple<T>::value>
+	{
+		assert(val.IsArray());
+		ReadObject(std::get<N>(t), val[N], bo);
 	}
 
 private:
