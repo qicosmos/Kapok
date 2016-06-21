@@ -210,17 +210,17 @@ private:
 		WriteArray(p);
 	}
 
-	template <size_t N>
-	void WriteObject(char const(&p)[N], std::true_type)
+	template <size_t N, typename BeginObject>
+	void WriteObject(char const(&p)[N], BeginObject bj)
 	{
 		WriteObject((const char*)p, bj);
 	}
 
-	template <size_t N>
-	void WriteObject(char const(&p)[N], std::false_type)
-	{
-		WriteObject((const char*)p, bj);
-	}
+	//template <size_t N>
+	//void WriteObject(char const(&p)[N], std::false_type)
+	//{
+	//	WriteObject((const char*)p, bj);
+	//}
 
 	template<typename Array>
 	inline void WriteArray(Array const& v)
