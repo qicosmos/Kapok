@@ -25,19 +25,19 @@ public:
 		return m_jsutil.GetJosnText();
 	}
 
-	template<typename T>
-	void Serialize(T&& t, const char* key = nullptr)
-	{	
-		m_jsutil.Reset();
-		if (key == nullptr)
-		{
-			WriteObject(t);
-		}
-		else 
-		{
-			SerializeImpl(t, key);
-		}
-	}
+	//template<typename T>
+	//void Serialize(T const& t, const char* key = nullptr)
+	//{	
+	//	m_jsutil.Reset();
+	//	if (key == nullptr)
+	//	{
+	//		WriteObject(t, std::true_type{});
+	//	}
+	//	else 
+	//	{
+	//		SerializeImpl(t, key);
+	//	}
+	//}
 
 	template<typename T>
 	void Serialize(const T& t, const char* key = nullptr)
@@ -45,21 +45,21 @@ public:
 		m_jsutil.Reset();
 		if (key == nullptr)
 		{
-			WriteObject(t);
+			WriteObject(t, std::true_type{});
 		}
 		else
 		{
-			SerializeImpl((T&)t, key);
+			SerializeImpl(t, key);
 		}
 	}
 
 private:
 	template<typename T>
-	void SerializeImpl(T&& t, const char* key)
+	void SerializeImpl(T const& t, const char* key)
 	{
 		m_jsutil.StartObject();
 		m_jsutil.WriteValue(key);
-		WriteObject(t);
+		WriteObject(t, std::true_type{});
 		m_jsutil.EndObject();
 	}
 
@@ -92,12 +92,12 @@ private:
 		return false;
 	}
 
-	template <typename T>
-	std::enable_if_t<is_optional<T>::value> WriteObject(T const& t)
+	template <typename T, typename BeginObjec>
+	std::enable_if_t<is_optional<T>::value> WriteObject(T const& t, BeginObjec bj)
 	{
 		if (static_cast<bool>(t))
 		{
-			WriteObject(*t);
+			WriteObject(*t, bj);
 		}
 		else
 		{
@@ -113,16 +113,16 @@ private:
 	//	m_jsutil.EndObject();
 	//}
 
-	template<typename T>
-	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t)
+	template<typename T, typename BeginObjec>
+	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t, BeginObjec)
 	{
 		m_jsutil.StartObject();
 		WriteTuple(((T&)t).Meta());
 		m_jsutil.EndObject();
 	}
 
-	template<typename T>
-	typename std::enable_if<is_tuple<T>::value>::type WriteObject(T&& t)
+	template<typename T, typename BeginObjec>
+	typename std::enable_if<is_tuple<T>::value>::type WriteObject(T const& t, BeginObjec)
 	{
 		m_jsutil.StartArray();
 		WriteTuple(t);
@@ -137,45 +137,47 @@ private:
 	template<std::size_t I = 0, typename Tuple>
 	typename std::enable_if<I < std::tuple_size<Tuple>::value>::type WriteTuple(const Tuple& t)
 	{
-		WriteObject(std::get<I>(t));
+		WriteObject(std::get<I>(t), std::false_type{});
 		WriteTuple<I + 1>(t);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_singlevalue_container<T>::value>::type WriteObject(T&& t)
+	template<typename T, typename BeginObjec>
+	typename std::enable_if<is_singlevalue_container<T>::value>::type WriteObject(T const& t, BeginObjec)
 	{
 		WriteArray(t);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_stack<T>::value || is_priority_queue<T>::value>::type WriteObject(T&& t)
+	template <typename Adaptor, typename F>
+	auto WriteAdaptor(Adaptor&& adaptor, F get)
 	{
-		WriteAdapter(t, [&]{return t.top(); });
-	}
-
-	template<typename Adapter, typename F>
-	inline void WriteAdapter(Adapter& v, F f)
-	{
+		using adaptor_t = std::remove_cv_t<std::remove_reference_t<Adaptor>>;
+		adaptor_t temp = std::forward<Adaptor>(adaptor);
 		m_jsutil.StartArray();
-		for (size_t i = 0, size = v.size(); i < size; i++)
+		while (!temp.empty())
 		{
-			WriteValue(f());
-			v.pop();
+			WriteObject(get(temp), std::false_type{});
+			temp.pop();
 		}
 		m_jsutil.EndArray();
 	}
 
-	template<typename T>
-	typename std::enable_if<is_queue<T>::value>::type WriteObject(T&& t)
+	template <typename T, typename BeginObject>
+	auto WriteObject(T&& t, BeginObject) -> std::enable_if_t<is_queue<T>::value>
 	{
-		WriteAdapter(t, [&]{return t.front(); });
+		WriteAdaptor(std::forward<T>(t), [](auto const& adaptor) { return adaptor.front(); });
 	}
 
-	template<typename T>
-	typename std::enable_if<is_map_container<T>::value>::type WriteObject(T&& t)
+	template<typename T, typename BeginObject>
+	auto WriteObject(T&& t, BeginObject) -> std::enable_if_t<is_stack<T>::value || is_priority_queue<T>::value>
+	{
+		WriteAdaptor(std::forward<T>(t), [](auto const& adaptor) { return adaptor.top(); });
+	}
+
+	template<typename T, typename BeginObject>
+	typename std::enable_if<is_map_container<T>::value>::type WriteObject(T const& t, BeginObject)
 	{
 		m_jsutil.StartObject();
-		for (auto& pair : t)
+		for (auto const& pair : t)
 		{
 			WriteKV(boost::lexical_cast<std::string>(pair.first).c_str(), pair.second);
 		}
@@ -183,48 +185,62 @@ private:
 	}
 
 	template<typename T>
-	typename std::enable_if<is_pair<T>::value>::type WriteObject(T&& t)
+	typename std::enable_if<is_pair<T>::value>::type WriteObject(T const& t, std::true_type)
+	{
+		m_jsutil.StartObject();
+		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
+		m_jsutil.EndObject();
+	}
+
+	template<typename T>
+	typename std::enable_if<is_pair<T>::value>::type WriteObject(T const& t, std::false_type)
 	{
 		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
 	}
 
-	template<typename T, size_t N>
-	void WriteObject(std::array<T, N>& t)
+	template<typename T, size_t N, typename BeginObject>
+	void WriteObject(std::array<T, N> const& t, BeginObject)
 	{
 		WriteArray(t);
 	}
 
-	template <typename T, size_t N>
-	void WriteObject(T(&p)[N])
+	template <typename T, size_t N, typename BeginObject>
+	void WriteObject(T const(&p)[N], BeginObject)
 	{
 		WriteArray(p);
 	}
 
 	template <size_t N>
-	void WriteObject(char(&p)[N])
+	void WriteObject(char const(&p)[N], std::true_type)
 	{
-		WriteObject((const char*)p);
+		WriteObject((const char*)p, bj);
+	}
+
+	template <size_t N>
+	void WriteObject(char const(&p)[N], std::false_type)
+	{
+		WriteObject((const char*)p, bj);
 	}
 
 	template<typename Array>
-	inline void WriteArray(Array& v)
+	inline void WriteArray(Array const& v)
 	{
 		m_jsutil.StartArray();
-		for (auto i : v)
+		for (auto const& i : v)
 		{
-			WriteObject(i);
+			WriteObject(i, std::false_type{});
 		}
 		m_jsutil.EndArray();
 	}
 
-	template<typename T>
-	typename std::enable_if<is_basic_type<T>::value>::type WriteObject(T&& t)
+	template<typename T, typename BeginObject>
+	typename std::enable_if<is_basic_type<T>::value>::type WriteObject(T const& t, BeginObject)
 	{
-		m_jsutil.WriteValue(std::forward<T>(t));
+		m_jsutil.WriteValue(t);
 	}
 
-	template <typename T>
-	auto WriteObject(T&& val) ->std::enable_if_t<std::is_enum<
+	template <typename T, typename BeginObject>
+	auto WriteObject(T const& val, BeginObject) ->std::enable_if_t<std::is_enum<
 		std::remove_reference_t<std::remove_cv_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<
@@ -232,26 +248,31 @@ private:
 		m_jsutil.WriteValue(static_cast<under_type>(val));
 	}
 
-	void WriteObject(const char* t)
+	void WriteObject(const char* t, std::true_type)
 	{
 		m_jsutil.WriteValue(t);
 	}
 
-	template<typename T>
-	typename std::enable_if<is_normal_class<T>::value>::type WriteValue(T&& t)
+	void WriteObject(const char* t, std::false_type)
 	{
-		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
+		m_jsutil.WriteValue(t);
 	}
+
+	//template<typename T>
+	//typename std::enable_if<is_normal_class<T>::value>::type WriteValue(T&& t)
+	//{
+	//	WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
+	//}
 
 	template<typename V>
 	void WriteKV(const char* k, V& v)
 	{
 		m_jsutil.WriteValue(k);
-		WriteObject(v);
+		WriteObject(v, std::true_type{});
 	}
 
-	template<typename T>
-	typename std::enable_if<is_basic_type<T>::value>::type WriteValue(T&& t)
+	template<typename T, typename BeginObject>
+	typename std::enable_if<is_basic_type<T>::value>::type WriteValue(T const& t, BeginObject)
 	{
 		m_jsutil.WriteValue(std::forward<T>(t));
 	}
