@@ -152,7 +152,7 @@ void test_performance()
 	person p = { 20, "test" };
 	Serializer sr;
 	
-	const int LEN = 1;
+	const int LEN = 1000000;
 	boost::timer timer;
 	for (size_t i = 0; i < LEN; i++)
 	{
