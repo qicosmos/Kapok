@@ -321,9 +321,9 @@ private:
 	{
 		assert(!val.IsArray());
 		decltype(auto) tuple_elem = std::get<N>(t);
-		auto it = val.MemberBegin() + N;
-		assert(0 == std::strcmp(tuple_elem.first, it->name.GetString()));
-		ReadObject(tuple_elem, (Value&)(it->value), bo);
+		auto itr = val.FindMember(tuple_elem.first);
+		assert(itr != val.MemberEnd());
+		ReadObject(tuple_elem, (Value&)(itr->value), bo);
 	}
 
 	template<size_t N = 0, typename T>
