@@ -298,7 +298,10 @@ private:
 		using first_type = typename pair_t::first_type;
 		using second_type = typename pair_t::second_type;
 
-		assert(val.MemberCount() == 1);
+		//assert(val.MemberCount() == 1);
+		if(val.MemberCount()!=1)
+			throw std::invalid_argument("member count error");
+
 		auto itr = val.MemberBegin();
 		t.first = boost::lexical_cast<first_type>(itr->name.GetString());
 		ReadObject(t.second, itr->value, bo);
@@ -319,17 +322,25 @@ private:
 	template<size_t N = 0, typename T>
 	auto ReadValue(T&& t, Value& val, std::false_type bo) -> std::enable_if_t<is_tuple<T>::value>
 	{
-		assert(!val.IsArray());
+		//assert(!val.IsArray());
+		if(val.IsArray())
+			throw std::invalid_argument("should not be array");
+
 		decltype(auto) tuple_elem = std::get<N>(t);
 		auto itr = val.FindMember(tuple_elem.first);
-		assert(itr != val.MemberEnd());
+		//if(itr==val.MemberEnd())
+		//	throw std::invalid_argument("the key is not exist");
+
+		//assert(itr != val.MemberEnd());
 		ReadObject(tuple_elem, (Value&)(itr->value), bo);
 	}
 
 	template<size_t N = 0, typename T>
 	auto ReadValue(T&& t, Value& val, std::true_type bo) -> std::enable_if_t<is_tuple<T>::value>
 	{
-		assert(val.IsArray());
+		//assert(val.IsArray());
+		if (!val.IsArray())
+			throw std::invalid_argument("should be array");
 		ReadObject(std::get<N>(t), val[N], bo);
 	}
 
