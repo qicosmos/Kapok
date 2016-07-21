@@ -214,6 +214,7 @@ struct T
 {
 	int a;
 	char b;
+private:
 	META(a, b);
 };
 
@@ -391,7 +392,7 @@ TEST_CASE(example)
 	test_array();
 	test_simple();
 	test_myperson();
-	test_performance();
+//	test_performance();
 	test_tuple();
 	test_recurse1();
 	test_recurse();
