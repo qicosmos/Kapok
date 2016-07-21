@@ -214,7 +214,7 @@ struct T
 {
 	int a;
 	char b;
-private:
+
 	META(a, b);
 };
 
