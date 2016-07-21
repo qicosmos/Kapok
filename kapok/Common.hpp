@@ -137,7 +137,7 @@ MAKE_TUPLE(MAKE_ARG_LIST(N, PAIR_OBJECT, __VA_ARGS__))
 #define GET_ARG_COUNT_INNER(...)    MARCO_EXPAND(ARG_N(__VA_ARGS__))
 #define GET_ARG_COUNT(...)          GET_ARG_COUNT_INNER(__VA_ARGS__, RSEQ_N())
 
-#define META(...) EMMBED_TUPLE(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define META(...) public: EMMBED_TUPLE(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 /******************************************/
 
 class NonCopyable
