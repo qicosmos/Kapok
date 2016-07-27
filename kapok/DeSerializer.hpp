@@ -329,7 +329,7 @@ private:
 		decltype(auto) tuple_elem = std::get<N>(t);
 		auto itr = val.FindMember(tuple_elem.first);
 		if(itr==val.MemberEnd())
-			throw std::invalid_argument("the key is not exist");
+			return;
 
 		//assert(itr != val.MemberEnd());
 		ReadObject(tuple_elem, (Value&)(itr->value), bo);
