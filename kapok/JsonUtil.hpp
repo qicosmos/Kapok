@@ -68,7 +68,8 @@ public:
 
 	void ReadValue(char*& t, Value& val)
 	{
-		t = (char*)val.GetString();
+		if (val.IsString())
+			t = (char*)val.GetString();
 	}
 
 	void WriteValue(const string& val)
@@ -78,7 +79,8 @@ public:
 
 	void ReadValue(string& t, Value& val)
 	{
-		t = val.GetString();
+		if(val.IsString())
+			t = val.GetString();
 	}
 
 	void Parse(const char* json)
@@ -111,7 +113,8 @@ public:
 
 	void ReadValue(uint8_t& t, Value& val)
 	{
-		t = (uint8_t)val.GetInt();
+		if (val.IsInt())
+			t = (uint8_t)val.GetInt();
 	}
 
 	void WriteValue(int8_t val)
@@ -121,7 +124,8 @@ public:
 
 	void ReadValue(int8_t& t, Value& val)
 	{
-		t = (int8_t)val.GetInt();
+		if (val.IsInt())
+			t = (int8_t)val.GetInt();
 	}
 
 	void WriteValue(int16_t val)
@@ -131,7 +135,8 @@ public:
 
 	void ReadValue(int16_t& t, Value& val)
 	{
-		t = (int16_t)val.GetInt();
+		if (val.IsInt())
+			t = (int16_t)val.GetInt();
 	}
 
 	void WriteValue(uint16_t val)
@@ -141,7 +146,8 @@ public:
 
 	void ReadValue(uint16_t& t, Value& val)
 	{
-		t = (uint16_t)val.GetInt();
+		if (val.IsInt())
+			t = (uint16_t)val.GetInt();
 	}
 
 	void WriteValue(int val)
@@ -151,7 +157,8 @@ public:
 
 	void ReadValue(int& t, Value& val)
 	{
-		t = val.GetInt();
+		if (val.IsInt())
+			t = val.GetInt();
 	}
 
 	void WriteValue(char val)
@@ -161,7 +168,8 @@ public:
 
 	void ReadValue(char& t, Value& val)
 	{
-		t = (char)val.GetInt();
+		if(val.IsInt())
+			t = (char)val.GetInt();
 	}
 
 	void WriteValue(uint32_t val)
@@ -171,7 +179,8 @@ public:
 
 	void ReadValue(uint32_t& t, Value& val)
 	{
-		t = val.GetUint();
+		if (val.IsUint())
+			t = val.GetUint();
 	}
 
 	void WriteValue(int64_t val)
@@ -181,7 +190,8 @@ public:
 
 	void ReadValue(int64_t& t, Value& val)
 	{
-		t = val.GetInt64();
+		if(val.IsInt64())
+			t = val.GetInt64();
 	}
 
 	void WriteValue(uint64_t val)
@@ -191,7 +201,8 @@ public:
 
 	void ReadValue(uint64_t& t, Value& val)
 	{
-		t = val.GetUint64();
+		if(val.IsUint64())
+			t = val.GetUint64();
 	}
 
 	void WriteValue(double val)
@@ -201,7 +212,8 @@ public:
 
 	void ReadValue(double& t, Value& val)
 	{
-		t = val.GetDouble();
+		if (val.IsNumber())
+			t = val.GetDouble();
 	}
 
 	void WriteValue(float val)
@@ -211,7 +223,8 @@ public:
 
 	void ReadValue(float& t, Value& val)
 	{
-		t = static_cast<float>(val.GetDouble());
+		if(val.IsNumber())
+			t = static_cast<float>(val.GetDouble());
 	}
 
 	template<typename T>
@@ -235,7 +248,8 @@ public:
 
 	void ReadValue(bool& t, Value& val)
 	{
-		t = val.GetBool();
+		if(val.IsBool())
+			t = val.GetBool();
 	}
 
 	const char* GetJosnText()
