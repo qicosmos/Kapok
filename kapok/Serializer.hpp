@@ -101,7 +101,7 @@ private:
 		}
 		else
 		{
-			m_jsutil.WriteNull();
+			WriteNull();
 		}
 	}
 
@@ -112,6 +112,48 @@ private:
 	//	WriteTuple(t.Meta());
 	//	m_jsutil.EndObject();
 	//}
+
+	// variant visitor
+	template <typename BeginObj>
+	struct serialize_visitor : boost::static_visitor<>
+	{
+		explicit serialize_visitor(Serializer& s, int which)
+			: s_(s)
+			, which_(which - 1)
+		{
+
+		}
+
+		template <typename T>
+		void operator() (T const& to_write) const
+		{
+			//s_.WriteObject(to_write, BeginObj{});
+			
+			s_.BeginWriteKV(std::to_string(which_).c_str(), to_write);
+		}
+
+		void operator() (boost::blank) const
+		{
+			throw;
+		}
+
+		Serializer& s_;
+		int which_;
+	};
+
+	template <typename BeginObj, typename ... Args>
+	void WriteObject(variant<Args...> const& v, BeginObj bj)
+	{
+		if (static_cast<bool>(v))
+		{
+			//WriteObject(*t, bj);
+			boost::apply_visitor(serialize_visitor<BeginObj>{ *this, v.which() }, v);
+		}
+		else
+		{
+			WriteNull();
+		}
+	}
 
 	template<typename T, typename BeginObjec>
 	typename std::enable_if<is_user_class<T>::value>::type WriteObject(const T& t, BeginObjec)
@@ -271,10 +313,23 @@ private:
 		WriteObject(v, std::true_type{});
 	}
 
+	template<typename V>
+	void BeginWriteKV(const char* k, V& v)
+	{
+		m_jsutil.StartObject();
+		WriteKV(k, v);
+		m_jsutil.EndObject();
+	}
+
 	template<typename T, typename BeginObject>
 	typename std::enable_if<is_basic_type<T>::value>::type WriteValue(T const& t, BeginObject)
 	{
 		m_jsutil.WriteValue(std::forward<T>(t));
+	}
+
+	void WriteNull()
+	{
+		m_jsutil.WriteNull();
 	}
 
 private:

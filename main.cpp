@@ -380,6 +380,24 @@ void test_pair()
 	assert(p.first == r.first && p.second == r.second);
 }
 
+void test_variant()
+{
+	Serializer sr;
+
+	variant<int, double, std::pair<float, string>> a, b;
+	a = std::make_pair(6.28, "zhengwei");
+	sr.Serialize(a);
+	auto result = sr.GetString();
+	std::cout << result << std::endl;
+	
+	DeSerializer ds;
+	ds.Parse(result);
+	ds.Deserialize(b);
+
+	auto r = boost::get<std::pair<float, string>>(a) == boost::get<std::pair<float, string>>(b);
+	assert(r);
+}
+
 TEST_CASE(example)
 {
 	test_pair();
@@ -459,7 +477,7 @@ TEST_CASE(example)
 	std::map<std::string, person> map2= { {"a", p} };
 	test_map(map2);
 
-
 	test_optional();
 	test_enum();
+	test_variant();
 }

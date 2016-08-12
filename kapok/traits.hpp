@@ -8,8 +8,60 @@
 #include <set>
 #include <unordered_set>
 #include <boost/optional.hpp>
+#include <boost/variant.hpp>
+#include <boost/mpl/at.hpp>
+#include <boost/mpl/remove.hpp>
 
 using namespace std;
+
+template <typename ... Args>
+struct variant : boost::variant<boost::blank, Args...> 
+{
+	using base_type = boost::variant<boost::blank, Args...>;
+	using types = typename boost::mpl::remove<typename base_type::types, boost::blank>::type;
+
+	explicit operator bool() const
+	{
+		return which() != 0;
+	}
+
+	template <typename T>
+	variant& operator= (T&& t)
+	{
+		return static_cast<variant&>(
+			static_cast<base_type&>(*this) = std::forward<T>(t));
+	}
+
+	bool operator== (variant const& other) const
+	{
+		return static_cast<base_type const&>(*this) == static_cast<base_type const&>(other);
+	}
+
+	bool operator!= (variant const& other) const
+	{
+		return !(*this == other);
+	}
+
+	bool operator< (variant const& other) const
+	{
+		return static_cast<base_type const&>(*this) < static_cast<base_type const&>(other);
+	}
+
+	bool operator> (variant const& other) const
+	{
+		return other < *this;
+	}
+
+	bool operator>= (variant const& other) const
+	{
+		return !(*this < other);
+	}
+
+	bool operator<= (variant const& other) const
+	{
+		return !(other < *this);
+	}
+};
 
 namespace detail
 {
@@ -136,15 +188,16 @@ struct is_specialization_of : std::false_type {};
 template <template <typename...> class Template, typename... Args>
 struct is_specialization_of<Template<Args...>, Template> : std::true_type{};
 
-template<typename T> struct is_optional : is_specialization_of<detail::decay_t<T>, boost::optional> {};
-template<typename T> struct is_tuple : is_specialization_of<detail::decay_t<T>, std::tuple>{};
-template<typename T> struct is_queue : is_specialization_of<detail::decay_t<T>, std::queue>{};
-template<typename T> struct is_stack : is_specialization_of<detail::decay_t<T>, std::stack>{};
-template<typename T> struct is_set : is_specialization_of<detail::decay_t<T>, std::set> {};
-template<typename T> struct is_multiset : is_specialization_of<detail::decay_t<T>, std::multiset> {};
-template<typename T> struct is_unordered_set : is_specialization_of<detail::decay_t<T>, std::unordered_set> {};
-template<typename T> struct is_priority_queue : is_specialization_of<detail::decay_t<T>, std::priority_queue>{};
-template<typename T> struct is_pair : is_specialization_of<detail::decay_t<T>, std::pair> {};
+template <typename T> struct is_optional : is_specialization_of<detail::decay_t<T>, boost::optional> {};
+template <typename T> struct is_tuple : is_specialization_of<detail::decay_t<T>, std::tuple>{};
+template <typename T> struct is_queue : is_specialization_of<detail::decay_t<T>, std::queue>{};
+template <typename T> struct is_stack : is_specialization_of<detail::decay_t<T>, std::stack>{};
+template <typename T> struct is_set : is_specialization_of<detail::decay_t<T>, std::set> {};
+template <typename T> struct is_multiset : is_specialization_of<detail::decay_t<T>, std::multiset> {};
+template <typename T> struct is_unordered_set : is_specialization_of<detail::decay_t<T>, std::unordered_set> {};
+template <typename T> struct is_priority_queue : is_specialization_of<detail::decay_t<T>, std::priority_queue>{};
+template <typename T> struct is_pair : is_specialization_of<detail::decay_t<T>, std::pair> {};
+template <typename T> struct is_variant : is_specialization_of<detail::decay_t<T>, variant> {};
 
 
 //#define IS_TEMPLATE_CLASS(token)

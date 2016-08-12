@@ -140,6 +140,21 @@ private:
 		}
 	}
 
+	template <typename BeginObject, typename ... Args>
+	void ReadObject(variant<Args...>& v, Value& value, BeginObject)
+	{
+		if (!value.IsObject() || value.MemberCount() != 1)
+			throw;
+
+		auto& object = value.MemberBegin();
+
+		auto index = boost::lexical_cast<size_t>(
+			object->name.GetString(), object->name.GetStringLength());
+
+		LoadVariant(object->value, index, v);
+		//LoadVariant(value, index, v);
+	}
+
 	template<typename Tuple, typename BeginObject>
 	void ReadTuple(Tuple&& tp, Value& val, BeginObject bo)
 	{
@@ -283,6 +298,13 @@ private:
 		ReadObject(t, val, std::true_type{});
 	}
 
+	template<size_t N = 0, typename BeginObject, typename ... Args>
+	void ReadValue(variant<Args...>& v, Value& val, BeginObject obj)
+	{
+		//ReadObject(t, val, std::true_type{});
+		ReadObject(v, val, std::true_type{});
+	}
+
 	template <size_t N = 0, typename T, typename BeginObject>
 	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
@@ -342,6 +364,58 @@ private:
 		if (!val.IsArray())
 			throw std::invalid_argument("should be array");
 		ReadObject(std::get<N>(t), val[N], bo);
+	}
+
+// functions for variant
+private:
+	template <int Index, typename ... Args>
+	void LoadVariantImplFunc(Value& value, variant<Args...>& v)
+	{
+		using index_type = boost::mpl::int_<Index>;
+		using value_type = typename boost::mpl::at<typename variant<Args...>::types, index_type>::type;
+		
+		value_type temp;
+		ReadObject(temp, value, std::true_type{});
+		
+		v = temp;
+	}
+
+	template <int Begin, int End>
+	struct LoadVariantImpl
+	{
+		template <typename Variant>
+		void operator() (DeSerializer& dr, Value& value, size_t index, Variant& v)
+		{
+			if (Begin == index)
+			{
+				dr.LoadVariantImplFunc<Begin>(value, v);
+				return;
+			}
+
+			LoadVariantImpl<Begin + 1, End>{}(dr, value, index, v);
+		}
+	};
+
+	template <int End>
+	struct LoadVariantImpl<End, End>
+	{
+		template <typename Variant>
+		void operator() (DeSerializer& dr,Value& value, size_t index, Variant& v)
+		{
+			if (End == index)
+			{
+				dr.LoadVariantImplFunc<End>(value, v);
+				return;
+			}
+
+			throw;
+		}
+	};
+
+	template <typename ... Args>
+	void LoadVariant(Value& value, size_t index, variant<Args...>& v)
+	{
+		LoadVariantImpl<0, sizeof...(Args) - 1>{}(*this, value, index, v);
 	}
 
 private:
