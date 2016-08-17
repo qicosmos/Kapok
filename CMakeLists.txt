@@ -17,8 +17,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 SET(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-include_directories(${PROJECT_SOURCE_DIR}
-					${CMAKE_CURRENT_SOURCE_DIR}/fmt
+include_directories(
+	${PROJECT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/fmt
 )
 
 set(SOURCE_FILES 
