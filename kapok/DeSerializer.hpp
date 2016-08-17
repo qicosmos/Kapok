@@ -144,7 +144,7 @@ private:
 	void ReadObject(variant<Args...>& v, Value& value, BeginObject)
 	{
 		if (!value.IsObject() || value.MemberCount() != 1)
-			throw;
+			throw std::invalid_argument{ "Should be an object with one member" };
 
 		auto object = value.MemberBegin();
 
@@ -408,7 +408,7 @@ private:
 				return;
 			}
 
-			throw;
+			throw std::invalid_argument{ "Wrong variant types." };
 		}
 	};
 

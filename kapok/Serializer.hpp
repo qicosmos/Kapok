@@ -122,20 +122,17 @@ private:
 			: s_(s)
 			, which_(which - 1)
 		{
-
 		}
 
 		template <typename T>
 		void operator() (T const& to_write) const
 		{
-			//s_.WriteObject(to_write, BeginObj{});
-			
 			s_.BeginWriteKV(std::to_string(which_).c_str(), to_write);
 		}
 
 		void operator() (boost::blank) const
-		{
-			throw;
+		{	
+			throw std::invalid_argument( "Cannot serialize an uninitialized Variant!" );
 		}
 
 		Serializer& s_;
