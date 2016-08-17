@@ -146,7 +146,7 @@ private:
 		if (!value.IsObject() || value.MemberCount() != 1)
 			throw;
 
-		auto& object = value.MemberBegin();
+		auto object = value.MemberBegin();
 
 		auto index = boost::lexical_cast<size_t>(
 			object->name.GetString(), object->name.GetStringLength());
