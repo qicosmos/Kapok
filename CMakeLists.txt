@@ -13,7 +13,9 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 endif ()
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS}
+					fmt
+)
 SET(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 include_directories(${PROJECT_SOURCE_DIR})

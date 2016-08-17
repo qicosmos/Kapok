@@ -7,6 +7,7 @@
 #include "Common.hpp"
 #include "JsonUtil.hpp"
 #include <boost/lexical_cast.hpp>
+#include <fmt/format.h>
 
 class Serializer : NonCopyable
 {
@@ -221,7 +222,9 @@ private:
 		m_jsutil.StartObject();
 		for (auto const& pair : t)
 		{
-			WriteKV(boost::lexical_cast<std::string>(pair.first).c_str(), pair.second);
+			m_wr << pair.first;
+			WriteKV(m_wr.c_str(), pair.second);
+			m_wr.clear();
 		}
 		m_jsutil.EndObject();
 	}
@@ -230,14 +233,18 @@ private:
 	typename std::enable_if<is_pair<T>::value>::type WriteObject(T const& t, std::true_type)
 	{
 		m_jsutil.StartObject();
-		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
+		m_wr << t.first;
+		WriteKV(m_wr.c_str(), t.second);
+		m_wr.clear();
 		m_jsutil.EndObject();
 	}
 
 	template<typename T>
 	typename std::enable_if<is_pair<T>::value>::type WriteObject(T const& t, std::false_type)
 	{
-		WriteKV(boost::lexical_cast<std::string>(t.first).c_str(), t.second);
+		m_wr << t.first;
+		WriteKV(m_wr.c_str(), t.second);
+		m_wr.clear();
 	}
 
 	template<typename T, size_t N, typename BeginObject>
@@ -334,5 +341,6 @@ private:
 
 private:
 	JsonUtil m_jsutil;
+	fmt::MemoryWriter m_wr;
 };
 
