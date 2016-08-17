@@ -22,7 +22,7 @@ struct variant : boost::variant<boost::blank, Args...>
 
 	explicit operator bool() const
 	{
-		return which() != 0;
+		return base_type::which() != 0;
 	}
 
 	template <typename T>
