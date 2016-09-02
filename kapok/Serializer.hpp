@@ -239,6 +239,7 @@ private:
 	template<typename T>
 	typename std::enable_if<is_pair<T>::value>::type WriteObject(T const& t, std::false_type)
 	{
+		m_wr.clear();
 		m_wr << t.first;
 		WriteKV(m_wr.c_str(), t.second);
 		m_wr.clear();
