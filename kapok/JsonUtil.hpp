@@ -26,7 +26,7 @@ public:
 	}
 
 	template<typename T>
-	void WriteJson(const string& key, T&& value)
+	void WriteJson(const std::string& key, T&& value)
 	{
 		m_writer.String(key.c_str());
 		WriteValue(std::forward<T>(value));
@@ -72,12 +72,12 @@ public:
 			t = (char*)val.GetString();
 	}
 
-	void WriteValue(const string& val)
+	void WriteValue(const std::string& val)
 	{
 		m_writer.String(val.c_str());
 	}
 
-	void ReadValue(string& t, Value& val)
+	void ReadValue(std::string& t, Value& val)
 	{
 		if(val.IsString())
 			t = val.GetString();
