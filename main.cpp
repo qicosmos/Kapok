@@ -17,10 +17,10 @@ void test()
 	Serializer sr;
 	DeSerializer dr;
 
-	auto tp = std::make_tuple(10, 12, string("test"));
+	auto tp = std::make_tuple(10, 12, std::string("test"));
 	sr.Serialize(tp, "tuple");
 	dr.Parse(sr.GetString());
-	std::tuple<int, int, string> p;
+	std::tuple<int, int, std::string> p;
 	dr.Deserialize(p, "tuple");
 }
 
@@ -202,7 +202,7 @@ void test_myperson()
 	my_person p = { {1,2,3}, 4 };
 	Serializer sr;
 	sr.Serialize(p);
-	std::cout << sr.GetString() << endl;
+	std::cout << sr.GetString() << std::endl;
 
 	DeSerializer dr;
 	dr.Parse(sr.GetString());
@@ -284,6 +284,8 @@ void test_str()
 
 void test_optional()
 {
+	using namespace std::string_literals;
+
 	struct test_optional_struct
 	{
 		int a;
@@ -384,7 +386,7 @@ void test_variant()
 {
 	Serializer sr;
 
-	variant<int, double, std::pair<float, string>> a, b;
+	variant<int, double, std::pair<float, std::string>> a, b;
 	a = std::make_pair(6.28, "zhengwei");
 	sr.Serialize(a);
 	auto result = sr.GetString();
@@ -394,7 +396,7 @@ void test_variant()
 	ds.Parse(result);
 	ds.Deserialize(b);
 
-	auto r = boost::get<std::pair<float, string>>(a) == boost::get<std::pair<float, string>>(b);
+	auto r = boost::get<std::pair<float, std::string>>(a) == boost::get<std::pair<float, std::string>>(b);
 	assert(r);
 }
 

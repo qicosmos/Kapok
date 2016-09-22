@@ -12,7 +12,7 @@
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/remove.hpp>
 
-using namespace std;
+//using namespace std;
 
 template <typename ... Args>
 struct variant : boost::variant<boost::blank, Args...> 

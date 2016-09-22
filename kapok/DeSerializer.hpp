@@ -12,7 +12,7 @@ public:
 		Parse(jsonText, length);
 	}
 	
-	DeSerializer(const string& jsonText)
+	DeSerializer(const std::string& jsonText)
 	{
 		Parse(jsonText);
 	}
@@ -21,7 +21,7 @@ public:
 	{
 	}
 	
-	void Parse(const string& jsonText)
+	void Parse(const std::string& jsonText)
 	{
 		Parse(jsonText.c_str(), jsonText.length());
 	}
@@ -37,7 +37,7 @@ public:
 	}
 	
 	template<typename T>
-	void Deserialize(T& t, const string& key, bool has_root = true)
+	void Deserialize(T& t, const std::string& key, bool has_root = true)
 	{
 		Deserialize(t, key.c_str(), has_root);
 	}
@@ -122,7 +122,7 @@ private:
 	}
 
 	template <typename T, typename BeginObject>
-	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<is_enum<
+	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
