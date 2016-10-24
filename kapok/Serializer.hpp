@@ -217,6 +217,7 @@ private:
 	typename std::enable_if<is_map_container<T>::value>::type WriteObject(T const& t, BeginObject)
 	{
 		m_jsutil.StartObject();
+		m_wr.clear();
 		for (auto const& pair : t)
 		{
 			m_wr << pair.first;
