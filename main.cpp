@@ -14,8 +14,8 @@
 
 void test()
 {
-	Serializer sr;
-	DeSerializer dr;
+    kapok::Serializer sr;
+    kapok::DeSerializer dr;
 
 	auto tp = std::make_tuple(10, 12, std::string("test"));
 	sr.Serialize(tp, "tuple");
@@ -27,6 +27,7 @@ void test()
 template<class T>
 void test_array( T& arr)
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize(arr, "test");
 	std::cout << sr.GetString() << std::endl;
@@ -40,6 +41,7 @@ void test_array( T& arr)
 template<class T>
 void test_map( T& map)
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize(map, "test");
 	std::cout << sr.GetString() << std::endl;
@@ -61,6 +63,7 @@ struct person
 template<class T>
 void test_object(T& t)
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize(t, "test");
 	std::cout << sr.GetString() << std::endl;
@@ -103,6 +106,7 @@ struct complex_t1
 
 void test_recurse1()
 {
+	using namespace kapok;
 	complex_t1 cpl = { 1,{ { { "d",{ { { 20, "tom" },{ 20, "tom" } } } } } } };
 	Serializer sr;
 	sr.Serialize(cpl, "test");
@@ -117,6 +121,7 @@ void test_recurse1()
 
 void test_recurse()
 {
+	using namespace kapok;
 	complex_t cpl = { 1,"b", {{"c", {20, "tom"}}}, /*{{"d", {{{20, "tom"},{ 20, "tom" } }}}}, */{ { { "d",{ { { 20, "tom" },{ 20, "tom" } } } } } } };
 	Serializer sr;
 	sr.Serialize(cpl, "test");
@@ -131,6 +136,7 @@ void test_recurse()
 
 void test_new_meta()
 {
+	using namespace kapok;
 	std::map<std::string, int> mp = { {"aa", 2} };
 	test_p p = { 20, "test", {{ "aa", 2 }}, {12, "td"} };
 
@@ -149,6 +155,7 @@ void test_new_meta()
 
 void test_performance()
 {
+	using namespace kapok;
 	person p = { 20, "test" };
 	Serializer sr;
 	
@@ -174,6 +181,7 @@ void test_performance()
 void test_tuple()
 {
 	using namespace std;
+	using namespace kapok;
 	cout << is_basic_type<int>::value << endl;
 	cout << is_normal_class<int>::value << endl;
 	std::vector<int> v = { 1,2,3 };
@@ -199,6 +207,7 @@ struct my_person
 
 void test_myperson()
 {
+	using namespace kapok;
 	my_person p = { {1,2,3}, 4 };
 	Serializer sr;
 	sr.Serialize(p);
@@ -220,6 +229,7 @@ struct T
 
 void test_simple()
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize((std::array<int, 5>{1, 2, 3, 4, 5}));
 	std::cout << sr.GetString() << std::endl;
@@ -231,6 +241,7 @@ void test_simple()
 
 void test_array()
 {
+	using namespace kapok;
 	DeSerializer dr;
 	dr.Parse(R"({"array":[1,2,3,4,5]})");
 	std::array<int, 5> v;
@@ -240,6 +251,7 @@ void test_array()
 
 void test_const(const person& p)
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize(p);
 	std::cout << sr.GetString() << std::endl;
@@ -247,6 +259,7 @@ void test_const(const person& p)
 
 void test_stack()
 {
+	using namespace kapok;
 	DeSerializer dr;
 	dr.Parse(R"({"stack":[1,2,3,4,5]})");
 	std::stack<int> v;
@@ -269,6 +282,7 @@ struct messager
 
 void test_sr()
 {
+    using namespace kapok;
 	messager m = { 1,2 };
 	Serializer sr;
 	sr.Serialize(m);
@@ -277,6 +291,7 @@ void test_sr()
 
 void test_str()
 {
+	using namespace kapok;
 	Serializer sr;
 	sr.Serialize("hello, world", "string value");
 	std::cout << sr.GetString() << std::endl;
@@ -285,6 +300,7 @@ void test_str()
 void test_optional()
 {
 	using namespace std::string_literals;
+	using namespace kapok;
 
 	struct test_optional_struct
 	{
@@ -331,6 +347,7 @@ enum class foo_enum
 
 void test_enum()
 {
+	using namespace kapok;
 	{
 		Serializer sr;
 		foo_enum aha = foo_enum::hahahaha;
@@ -367,6 +384,7 @@ void test_enum()
 
 void test_pair()
 {
+	using namespace kapok;
 	std::pair<int, double> p = { 1, 0.2 };
 	std::pair<int, double> r;
 
@@ -384,6 +402,7 @@ void test_pair()
 
 void test_variant()
 {
+	using namespace kapok;
 	Serializer sr;
 
 	variant<int, double, std::pair<float, std::string>> a, b;
