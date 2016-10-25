@@ -1,5 +1,9 @@
 #pragma once
 
+#include <array>
+#include <tuple>
+
+namespace kapok {
 template<unsigned N>
 std::array<std::string, N> split(const std::string& s, const char delimiter)
 {
@@ -147,3 +151,4 @@ public:
 	NonCopyable& operator = (const NonCopyable&) = delete; 
 	NonCopyable() = default; 
 };
+} // namespace kapok
