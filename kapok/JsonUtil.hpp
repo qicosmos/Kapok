@@ -252,7 +252,7 @@ public:
 			t = val.GetBool();
 	}
 
-	const char* GetJosnText()
+	const char* GetJsonText()
 	{
 		return m_buf.GetString();
 	}

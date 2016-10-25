@@ -24,7 +24,7 @@ public:
 
 	const char* GetString()
 	{
-		return m_jsutil.GetJosnText();
+		return m_jsutil.GetJsonText();
 	}
 
 	//template<typename T>

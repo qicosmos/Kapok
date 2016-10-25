@@ -52,7 +52,7 @@ void test_kapok()
 {
 	my_person p = { "test", 20 };
 
-	Serializer sr;
+    kapok::Serializer sr;
 	boost::timer tm;
 	for (size_t i = 0; i < MAXSIZE; i++)
 	{
@@ -62,7 +62,7 @@ void test_kapok()
 
 	tm.restart();
 	my_person rp;
-	DeSerializer dr;
+	kapok::DeSerializer dr;
 	for (size_t i = 0; i < MAXSIZE; i++)
 	{
 		dr.Parse(sr.GetString());
@@ -98,8 +98,8 @@ void test_kapok_all()
 	my_person p = { "test", 20 };
 	my_person rp;
 
-	Serializer sr;
-	DeSerializer dr;
+	kapok::Serializer sr;
+	kapok::DeSerializer dr;
 	boost::timer tm;
 	for (size_t i = 0; i < MAXSIZE; i++)
 	{
@@ -107,7 +107,7 @@ void test_kapok_all()
 		dr.Parse(sr.GetString());
 		dr.Deserialize(rp);
 	}
-	std::cout << tm.elapsed() << " kapok" << endl;
+	std::cout << tm.elapsed() << " kapok" << std::endl;
 }
 
 void test_msgpack_all()
@@ -124,7 +124,7 @@ void test_msgpack_all()
 		msgpack::pack(sbuf, p);
 		msgpack::unpack(sbuf.data(), sbuf.size()).get().convert(rp);
 	}
-	std::cout << tm.elapsed() << " msgpack" << endl;
+	std::cout << tm.elapsed() << " msgpack" << std::endl;
 }
 
 int main(void) {
