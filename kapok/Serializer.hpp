@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <fmt/format.h>
 
+namespace kapok {
 class Serializer : NonCopyable
 {
 public:
@@ -342,4 +343,5 @@ private:
 	JsonUtil m_jsutil;
 	fmt::MemoryWriter m_wr;
 };
+} // namespace kapok
 

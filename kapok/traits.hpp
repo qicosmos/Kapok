@@ -14,6 +14,7 @@
 
 //using namespace std;
 
+namespace kapok {
 template <typename ... Args>
 struct variant : boost::variant<boost::blank, Args...> 
 {
@@ -217,3 +218,5 @@ template<typename T>
 struct is_user_class : std::integral_constant<bool, is_normal_class<T>::value&&!is_container_adapter<T>::value
 	&&!is_stack<T>::value&&!is_container<T>::value&&!is_tuple<T>::value&&!is_pair<T>::value&&!is_optional<T>::value>
 {};
+
+} // namespace kapok

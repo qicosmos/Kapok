@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(kapok)
 add_definitions(-DFMT_HEADER_ONLY)
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
@@ -31,6 +30,7 @@ set(SOURCE_FILES
 		test/user.cpp
 	)
 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/kapok/ DESTINATION "include/kapok" FILES_MATCHING PATTERN "*.hpp")
 
 add_executable(kapok ${SOURCE_FILES})
 target_link_libraries(kapok ${EXTRA_LIBS})
