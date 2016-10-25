@@ -4,6 +4,7 @@
 
 TEST_CASE(user_type_with_primitive)
 {
+    using namespace kapok;
     struct T
     {
         int a;
@@ -27,6 +28,7 @@ TEST_CASE(user_type_with_primitive)
 
 TEST_CASE(user_type_with_string)
 {
+	using namespace kapok;
     struct T
     {
         std::string a;
@@ -49,6 +51,7 @@ TEST_CASE(user_type_with_string)
 
 TEST_CASE(user_type_with_container)
 {
+	using namespace kapok;
     struct T
     {
         std::map<int, std::string> a;

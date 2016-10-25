@@ -5,6 +5,7 @@
 
 TEST_CASE(string_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize("hello, world", "string value");
     TEST_CHECK(sr.GetString() == std::string(R"({"string value":"hello, world"})"));  
@@ -12,6 +13,7 @@ TEST_CASE(string_serialize)
 
 TEST_CASE(string_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"string value":"hello, world"})");
     std::string v;
@@ -21,6 +23,7 @@ TEST_CASE(string_deserialize)
 
 TEST_CASE(array_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize((std::array<int, 5>{1, 2, 3, 4, 5}), "array");   
     TEST_CHECK(sr.GetString() == std::string(R"({"array":[1,2,3,4,5]})"));
@@ -28,6 +31,7 @@ TEST_CASE(array_serialize)
 
 TEST_CASE(array_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"array":[1,2,3,4,5]})");
     std::array<int, 5> v;
@@ -38,6 +42,7 @@ TEST_CASE(array_deserialize)
 
 TEST_CASE(vector_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(std::vector<int>{1, 2, 3, 4, 5}, "vector");
     TEST_CHECK(sr.GetString() == std::string(R"({"vector":[1,2,3,4,5]})"));
@@ -45,6 +50,7 @@ TEST_CASE(vector_serialize)
 
 TEST_CASE(vector_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"vector":[1,2,3,4,5]})");
     std::vector<int> v;
@@ -54,6 +60,7 @@ TEST_CASE(vector_deserialize)
 
 TEST_CASE(queue_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     std::queue<int> q; q.push(1); q.push(2); q.push(3); q.push(4); q.push(5);
     sr.Serialize(q, "queue");
@@ -62,6 +69,7 @@ TEST_CASE(queue_serialize)
 
 TEST_CASE(queue_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"queue":[1,2,3,4,5]})");
     std::queue<int> v;
@@ -75,6 +83,7 @@ TEST_CASE(queue_deserialize)
 
 TEST_CASE(stack_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     std::stack<int> q; q.push(5); q.push(4); q.push(3); q.push(2); q.push(1);
     sr.Serialize(q, "stack");
@@ -83,6 +92,7 @@ TEST_CASE(stack_serialize)
 
 TEST_CASE(stack_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"stack":[1,2,3,4,5]})");
     std::stack<int> v;
@@ -96,6 +106,7 @@ TEST_CASE(stack_deserialize)
 
 TEST_CASE(set_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(std::set<int>{1, 2, 3, 4, 5}, "set");
     TEST_CHECK(sr.GetString() == std::string(R"({"set":[1,2,3,4,5]})"));
@@ -103,6 +114,7 @@ TEST_CASE(set_serialize)
 
 TEST_CASE(set_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"set":[1,2,3,4,5]})");
     std::set<int> v;
@@ -112,6 +124,7 @@ TEST_CASE(set_deserialize)
 
 TEST_CASE(unordered_set_serialize_and_deserialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(std::unordered_set<int>{1, 2, 3, 4, 5}, "set");
         
@@ -124,6 +137,7 @@ TEST_CASE(unordered_set_serialize_and_deserialize)
 
 TEST_CASE(unordered_set_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"set":[1,2,3,4,5]})");
     std::unordered_set<int> v;
@@ -133,6 +147,7 @@ TEST_CASE(unordered_set_deserialize)
 
 TEST_CASE(map_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(std::map<std::string, int>{{"1", 1}, {"2", 2}, {"3", 3}}, "map");
     TEST_CHECK(sr.GetString() == std::string(R"({"map":{"1":1,"2":2,"3":3}})"));
@@ -140,6 +155,7 @@ TEST_CASE(map_serialize)
 
 TEST_CASE(map_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"map":{"1":1,"2":2,"3":3}})");
     std::map<std::string, int> v;
@@ -149,6 +165,7 @@ TEST_CASE(map_deserialize)
 
 TEST_CASE(unordered_map_serialize_and_deserialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(std::unordered_map<std::string, int>{{"1", 1}, {"2", 2}, {"3", 3}}, "map");
 
@@ -161,6 +178,7 @@ TEST_CASE(unordered_map_serialize_and_deserialize)
 
 TEST_CASE(unordered_map_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"map":{"1":1,"2":2,"3":3}})");
     std::unordered_map<std::string, int> v;
@@ -170,6 +188,7 @@ TEST_CASE(unordered_map_deserialize)
 
 TEST_CASE(stl_with_user_type)
 {
+	using namespace kapok;
     struct T
     {
         std::string key;

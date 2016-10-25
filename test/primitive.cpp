@@ -3,6 +3,7 @@
 
 TEST_CASE(char_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize('c', "char value");
     TEST_CHECK(sr.GetString() == std::string(R"({"char value":99})"));
@@ -10,6 +11,7 @@ TEST_CASE(char_serialize)
 
 TEST_CASE(char_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"char value":99})");
     char v = 0;
@@ -19,6 +21,7 @@ TEST_CASE(char_deserialize)
 
 TEST_CASE(int_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     sr.Serialize(0, "int value");
     TEST_CHECK(sr.GetString() == std::string(R"({"int value":0})"));
@@ -26,6 +29,7 @@ TEST_CASE(int_serialize)
 
 TEST_CASE(int_deserialize)
 {
+	using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"int value":0})");
     int v = -1;
@@ -35,6 +39,7 @@ TEST_CASE(int_deserialize)
 
 TEST_CASE(array_serialize)
 {
+	using namespace kapok;
     Serializer sr;
     int a[] = {1, 2, 3, 4, 5};
     sr.Serialize(a, "array");
@@ -43,6 +48,7 @@ TEST_CASE(array_serialize)
 
 TEST_CASE(array_deserialize)
 {
+    using namespace kapok;
     DeSerializer dr;
     dr.Parse(R"({"array":[1,2,3,4,5]})");
     int v[5];
