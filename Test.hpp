@@ -2,8 +2,8 @@
 
 void Performance()
 {
-	Serializer sr;
-	DeSerializer dr;
+	kapok::Serializer sr;
+	kapok::DeSerializer dr;
 	
 	auto tp = std::make_tuple(10, 12, string("test"));
 	Timer t;
@@ -16,5 +16,5 @@ void Performance()
 	}
 
 	int64_t elapsed = t.elapsed();
-	cout << "kapok: " << elapsed <<"ms"<< endl;
+    std::cout << "kapok: " << elapsed <<"ms"<< std::endl;
 }
