@@ -3,6 +3,7 @@
 
 TEST_CASE(deserialize_with_wrong_key)
 {
+	using namespace kapok;
     int v = 0; 
     DeSerializer dr;
     dr.Parse(R"({"int":233})");
@@ -22,6 +23,7 @@ TEST_CASE(deserialize_with_wrong_key)
 
 TEST_CASE(deserialize_with_invalid_string)
 {
+	using namespace kapok;
     DeSerializer dr;
 
     bool flag = false;

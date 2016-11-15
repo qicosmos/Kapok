@@ -3,6 +3,7 @@
 #include "traits.hpp"
 #include <boost/lexical_cast.hpp>
 
+namespace kapok {
 class DeSerializer : NonCopyable
 {
 public:
@@ -31,7 +32,7 @@ public:
 		m_jsutil.Parse(jsonText, length);
 	}
 
-	Document&  GetDocument()
+    rapidjson::Document&  GetDocument()
 	{
 		return m_jsutil.GetDocument();
 	}
@@ -45,7 +46,7 @@ public:
 	template<typename T>
 	void Deserialize(T& t, const char* key, bool has_root = true)
 	{
-		Value& jsonval = GetRootValue(key, has_root);
+        rapidjson::Value& jsonval = GetRootValue(key, has_root);
 
 		ReadObject(t, jsonval, std::true_type{});
 	}
@@ -53,7 +54,7 @@ public:
 	template<typename T>
 	void Deserialize(T& t, bool has_root = false)
 	{
-		Value& jsonval = GetRootValue(nullptr, has_root);
+        rapidjson::Value& jsonval = GetRootValue(nullptr, has_root);
 
 		ReadObject(t, jsonval, std::true_type{});
 	}
@@ -71,16 +72,16 @@ public:
 	}
 
 private:
-    Value& GetRootValue(const char* key, bool has_root = true)
+    rapidjson::Value& GetRootValue(const char* key, bool has_root = true)
 	{
-		Document& doc = m_jsutil.GetDocument();
+        rapidjson::Document& doc = m_jsutil.GetDocument();
 		if (!has_root)
 			return doc;
 
 		if (key == nullptr)
 		{
 			auto it = doc.MemberBegin();
-			return (Value&)it->value;
+			return (rapidjson::Value&)it->value;
 		}
 			
 		if (!doc.HasMember(key))
@@ -92,16 +93,16 @@ private:
 	template<typename value_type, typename T>
 	void ReadArray(T& t, const char* key)
 	{
-		Value& jsonval = GetRootValue(key);
+        rapidjson::Value& jsonval = GetRootValue(key);
 
 		ReadArray<value_type>(t, jsonval);
 	}
 
 	template<typename value_type, typename T>
-	void ReadArray(T& t, Value& jsonval)
+	void ReadArray(T& t, rapidjson::Value& jsonval)
 	{
 		size_t sz = jsonval.Size();
-		for (SizeType i = 0; i < sz; i++)
+		for (rapidjson::SizeType i = 0; i < sz; i++)
 		{
 			value_type value;
 			ReadValue(value, jsonval[i], std::true_type{});
@@ -110,19 +111,19 @@ private:
 	}
 
 	template<typename T, typename BeginObject>
-	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, Value& val, BeginObject bo)
+	typename std::enable_if<is_tuple<T>::value>::type ReadObject(T& t, rapidjson::Value& val, BeginObject bo)
 	{
 		ReadTuple(std::forward<T>(t), val, bo);
 	}
 
 	template<typename T, typename BeginObject>
-	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, Value& val, BeginObject)
+	typename std::enable_if<is_user_class<T>::value>::type ReadObject(T& t, rapidjson::Value& val, BeginObject)
 	{
 		ReadTuple(t.Meta(), val, std::false_type{});
 	}
 
 	template <typename T, typename BeginObject>
-	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
+	auto ReadObject(T& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
@@ -130,7 +131,7 @@ private:
 	}
 
 	template <typename T, typename BeginObject>
-	auto ReadObject(T& t, Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
+	auto ReadObject(T& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
 	{
 		if (!val.IsNull())
 		{
@@ -141,7 +142,7 @@ private:
 	}
 
 	template <typename BeginObject, typename ... Args>
-	void ReadObject(variant<Args...>& v, Value& value, BeginObject)
+	void ReadObject(variant<Args...>& v, rapidjson::Value& value, BeginObject)
 	{
 		if (!value.IsObject() || value.MemberCount() != 1)
 			throw std::invalid_argument{ "Should be an object with one member" };
@@ -156,25 +157,25 @@ private:
 	}
 
 	template<typename Tuple, typename BeginObject>
-	void ReadTuple(Tuple&& tp, Value& val, BeginObject bo)
+	void ReadTuple(Tuple&& tp, rapidjson::Value& val, BeginObject bo)
 	{
 		const int size = std::tuple_size<Tuple>::value;
 		
-		for (SizeType j = 0; j < size; j++)
+		for (rapidjson::SizeType j = 0; j < size; j++)
 		{
 			SetValueByIndex(j, tp, val, bo);
 		}
 	}
 
 	template<size_t k=0, typename Tuple, typename BeginObject>
-	inline auto SetValueByIndex(size_t, Tuple&, Value&, BeginObject) ->
+	inline auto SetValueByIndex(size_t, Tuple&, rapidjson::Value&, BeginObject) ->
 		std::enable_if_t<(k == std::tuple_size<Tuple>::value)>
 	{
 		throw std::invalid_argument("arg index out of range");
 	}
 
 	template<size_t k = 0, typename Tuple, typename BeginObject>
-	inline auto SetValueByIndex(size_t index, Tuple& tp, Value& val, BeginObject bo) ->
+	inline auto SetValueByIndex(size_t index, Tuple& tp, rapidjson::Value& val, BeginObject bo) ->
 		std::enable_if_t<(k < std::tuple_size<Tuple>::value)>
 	{
 		if (k == index)
@@ -188,13 +189,13 @@ private:
 	}
 
 	template<typename T, typename BeginObject>
-	auto ReadObject(T&& t, Value& v, BeginObject) ->
+	auto ReadObject(T&& t, rapidjson::Value& v, BeginObject) ->
 		std::enable_if_t<is_stack<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
 		size_t sz = v.Size();
-		for (SizeType i = sz; i > 0; i--)
+		for (rapidjson::SizeType i = sz; i > 0; i--)
 		{
 			typename U::value_type value;
 			ReadObject(value, v[i - 1], std::true_type{});
@@ -203,13 +204,13 @@ private:
 	}
 
 	template<typename T, typename BeginObject>
-	auto ReadObject(T&& t, Value& v, BeginObject) ->
+	auto ReadObject(T&& t, rapidjson::Value& v, BeginObject) ->
 		std::enable_if_t<is_singlevalue_container<T>::value || is_container_adapter<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
 		size_t sz = v.Size();
-		for (SizeType i = 0; i < sz; i++)
+		for (rapidjson::SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
 			ReadObject(value, v[i], std::true_type{});
@@ -218,13 +219,13 @@ private:
 	}
 
 	template<typename T, typename BeginObject>
-	auto ReadObject(T&& t, Value& v, BeginObject) ->
+	auto ReadObject(T&& t, rapidjson::Value& v, BeginObject) ->
 		std::enable_if_t<std::is_array<T>::value || is_std_array<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
 		size_t sz = v.Size();
-		for (SizeType i = 0; i < sz; i++)
+		for (rapidjson::SizeType i = 0; i < sz; i++)
 		{
 			typename U::value_type value;
 			ReadObject(value, v[i], std::true_type{});
@@ -261,7 +262,7 @@ private:
 	}
 
 	template<typename T, typename BeginObject>
-	auto ReadObject(T&& t, Value& v, BeginObject) -> std::enable_if_t<is_map_container<T>::value>
+	auto ReadObject(T&& t, rapidjson::Value& v, BeginObject) -> std::enable_if_t<is_map_container<T>::value>
 	{
 		using U = typename std::decay<T>::type;
 
@@ -274,39 +275,39 @@ private:
 
 			key = boost::lexical_cast<key_type>(it->name.GetString());
 
-			ReadObject(value, (Value&)it->value, std::true_type {});
+			ReadObject(value, (rapidjson::Value&)it->value, std::true_type {});
 
 			t.emplace(key, value);
 		}
 	}
 
 	template<typename T, typename BeginObject>
-	auto ReadObject(T&& t, Value& v, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
+	auto ReadObject(T&& t, rapidjson::Value& v, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), v);
 	}
 
 	template<size_t N=0, typename T, typename BeginObject>
-	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_user_class<T>::value>
+	auto ReadValue(T&& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<is_user_class<T>::value>
 	{
 		ReadObject(t, val, std::false_type{});
 	}
 
 	template<size_t N = 0, typename T, typename BeginObject>
-	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
+	auto ReadValue(T&& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<is_optional<T>::value>
 	{
 		ReadObject(t, val, std::true_type{});
 	}
 
 	template<size_t N = 0, typename BeginObject, typename ... Args>
-	void ReadValue(variant<Args...>& v, Value& val, BeginObject obj)
+	void ReadValue(variant<Args...>& v, rapidjson::Value& val, BeginObject obj)
 	{
 		//ReadObject(t, val, std::true_type{});
 		ReadObject(v, val, std::true_type{});
 	}
 
 	template <size_t N = 0, typename T, typename BeginObject>
-	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
+	auto ReadValue(T&& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<std::is_enum<
 		std::remove_cv_t<std::remove_reference_t<T>>>::value>
 	{
 		using under_type = std::underlying_type_t<std::remove_cv_t<std::remove_reference_t<T>>>;
@@ -314,7 +315,7 @@ private:
 	}
 
 	template<size_t N = 0, typename T>
-	auto ReadObject(T&& t, Value& val, std::true_type bo) -> std::enable_if_t<is_pair<T>::value>
+	auto ReadObject(T&& t, rapidjson::Value& val, std::true_type bo) -> std::enable_if_t<is_pair<T>::value>
 	{
 		using pair_t = std::remove_cv_t<std::remove_reference_t<T>>;
 		using first_type = typename pair_t::first_type;
@@ -330,19 +331,19 @@ private:
 	}
 
 	template<size_t N = 0, typename T>
-	auto ReadObject(T&& t, Value& val, std::false_type bo) -> std::enable_if_t<is_pair<T>::value>
+	auto ReadObject(T&& t, rapidjson::Value& val, std::false_type bo) -> std::enable_if_t<is_pair<T>::value>
 	{
 		ReadObject(t.second, val, bo);
 	}
 
 	template<size_t N = 0, typename T, typename BeginObject>
-	auto ReadValue(T&& t, Value& val, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
+	auto ReadValue(T&& t, rapidjson::Value& val, BeginObject) -> std::enable_if_t<is_basic_type<T>::value>
 	{
 		m_jsutil.ReadValue(std::forward<T>(t), val);
 	}
 
 	template<size_t N = 0, typename T>
-	auto ReadValue(T&& t, Value& val, std::false_type bo) -> std::enable_if_t<is_tuple<T>::value>
+	auto ReadValue(T&& t, rapidjson::Value& val, std::false_type bo) -> std::enable_if_t<is_tuple<T>::value>
 	{
 		//assert(!val.IsArray());
 		if(val.IsArray())
@@ -354,11 +355,11 @@ private:
 			return;
 
 		//assert(itr != val.MemberEnd());
-		ReadObject(tuple_elem, (Value&)(itr->value), bo);
+		ReadObject(tuple_elem, (rapidjson::Value&)(itr->value), bo);
 	}
 
 	template<size_t N = 0, typename T>
-	auto ReadValue(T&& t, Value& val, std::true_type bo) -> std::enable_if_t<is_tuple<T>::value>
+	auto ReadValue(T&& t, rapidjson::Value& val, std::true_type bo) -> std::enable_if_t<is_tuple<T>::value>
 	{
 		//assert(val.IsArray());
 		if (!val.IsArray())
@@ -369,7 +370,7 @@ private:
 // functions for variant
 private:
 	template <int Index, typename ... Args>
-	void LoadVariantImplFunc(Value& value, variant<Args...>& v)
+	void LoadVariantImplFunc(rapidjson::Value& value, variant<Args...>& v)
 	{
 		using index_type = boost::mpl::int_<Index>;
 		using value_type = typename boost::mpl::at<typename variant<Args...>::types, index_type>::type;
@@ -384,7 +385,7 @@ private:
 	struct LoadVariantImpl
 	{
 		template <typename Variant>
-		void operator() (DeSerializer& dr, Value& value, size_t index, Variant& v)
+		void operator() (DeSerializer& dr, rapidjson::Value& value, size_t index, Variant& v)
 		{
 			if (Begin == index)
 			{
@@ -400,7 +401,7 @@ private:
 	struct LoadVariantImpl<End, End>
 	{
 		template <typename Variant>
-		void operator() (DeSerializer& dr,Value& value, size_t index, Variant& v)
+		void operator() (DeSerializer& dr,rapidjson::Value& value, size_t index, Variant& v)
 		{
 			if (End == index)
 			{
@@ -413,7 +414,7 @@ private:
 	};
 
 	template <typename ... Args>
-	void LoadVariant(Value& value, size_t index, variant<Args...>& v)
+	void LoadVariant(rapidjson::Value& value, size_t index, variant<Args...>& v)
 	{
 		LoadVariantImpl<0, sizeof...(Args) - 1>{}(*this, value, index, v);
 	}
@@ -421,4 +422,6 @@ private:
 private:
 	JsonUtil m_jsutil;
 };
+} // namespace kapok
+
 

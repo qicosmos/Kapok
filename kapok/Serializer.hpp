@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <fmt/format.h>
 
+namespace kapok {
 class Serializer : NonCopyable
 {
 public:
@@ -23,7 +24,7 @@ public:
 
 	const char* GetString()
 	{
-		return m_jsutil.GetJosnText();
+		return m_jsutil.GetJsonText();
 	}
 
 	//template<typename T>
@@ -217,6 +218,7 @@ private:
 	typename std::enable_if<is_map_container<T>::value>::type WriteObject(T const& t, BeginObject)
 	{
 		m_jsutil.StartObject();
+		m_wr.clear();
 		for (auto const& pair : t)
 		{
 			m_wr << pair.first;
@@ -341,4 +343,5 @@ private:
 	JsonUtil m_jsutil;
 	fmt::MemoryWriter m_wr;
 };
+} // namespace kapok
 

@@ -4,14 +4,14 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
-using namespace rapidjson;
 
 #include "traits.hpp"
 #include "Common.hpp"
 
+namespace kapok {
 class JsonUtil : NonCopyable
 {
-	typedef Writer<StringBuffer> JsonWriter;
+	typedef rapidjson::Writer<rapidjson::StringBuffer> JsonWriter;
 public:
 
 	JsonUtil() : m_writer(m_buf)
@@ -66,7 +66,7 @@ public:
 			m_writer.String(val);
 	}
 
-	void ReadValue(char*& t, Value& val)
+	void ReadValue(char*& t, rapidjson::Value& val)
 	{
 		if (val.IsString())
 			t = (char*)val.GetString();
@@ -77,7 +77,7 @@ public:
 		m_writer.String(val.c_str());
 	}
 
-	void ReadValue(std::string& t, Value& val)
+	void ReadValue(std::string& t, rapidjson::Value& val)
 	{
 		if(val.IsString())
 			t = val.GetString();
@@ -101,7 +101,7 @@ public:
 		}
 	}
 
-	Document& GetDocument()
+    rapidjson::Document& GetDocument()
 	{
 		return m_doc;
 	}
@@ -111,7 +111,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(uint8_t& t, Value& val)
+	void ReadValue(uint8_t& t, rapidjson::Value& val)
 	{
 		if (val.IsInt())
 			t = (uint8_t)val.GetInt();
@@ -122,7 +122,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(int8_t& t, Value& val)
+	void ReadValue(int8_t& t, rapidjson::Value& val)
 	{
 		if (val.IsInt())
 			t = (int8_t)val.GetInt();
@@ -133,7 +133,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(int16_t& t, Value& val)
+	void ReadValue(int16_t& t, rapidjson::Value& val)
 	{
 		if (val.IsInt())
 			t = (int16_t)val.GetInt();
@@ -144,7 +144,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(uint16_t& t, Value& val)
+	void ReadValue(uint16_t& t, rapidjson::Value& val)
 	{
 		if (val.IsInt())
 			t = (uint16_t)val.GetInt();
@@ -155,7 +155,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(int& t, Value& val)
+	void ReadValue(int& t, rapidjson::Value& val)
 	{
 		if (val.IsInt())
 			t = val.GetInt();
@@ -166,7 +166,7 @@ public:
 		m_writer.Int(val);
 	}
 
-	void ReadValue(char& t, Value& val)
+	void ReadValue(char& t, rapidjson::Value& val)
 	{
 		if(val.IsInt())
 			t = (char)val.GetInt();
@@ -177,7 +177,7 @@ public:
 		m_writer.Uint(val);
 	}
 
-	void ReadValue(uint32_t& t, Value& val)
+	void ReadValue(uint32_t& t, rapidjson::Value& val)
 	{
 		if (val.IsUint())
 			t = val.GetUint();
@@ -188,7 +188,7 @@ public:
 		m_writer.Int64(val);
 	}
 
-	void ReadValue(int64_t& t, Value& val)
+	void ReadValue(int64_t& t, rapidjson::Value& val)
 	{
 		if(val.IsInt64())
 			t = val.GetInt64();
@@ -199,7 +199,7 @@ public:
 		m_writer.Uint64(val);
 	}
 
-	void ReadValue(uint64_t& t, Value& val)
+	void ReadValue(uint64_t& t, rapidjson::Value& val)
 	{
 		if(val.IsUint64())
 			t = val.GetUint64();
@@ -210,7 +210,7 @@ public:
 		m_writer.Double(val);
 	}
 
-	void ReadValue(double& t, Value& val)
+	void ReadValue(double& t, rapidjson::Value& val)
 	{
 		if (val.IsNumber())
 			t = val.GetDouble();
@@ -221,7 +221,7 @@ public:
 		m_writer.Double(static_cast<double>(val));
 	}
 
-	void ReadValue(float& t, Value& val)
+	void ReadValue(float& t, rapidjson::Value& val)
 	{
 		if(val.IsNumber())
 			t = static_cast<float>(val.GetDouble());
@@ -246,19 +246,21 @@ public:
 		m_writer.Null();
 	}
 
-	void ReadValue(bool& t, Value& val)
+	void ReadValue(bool& t, rapidjson::Value& val)
 	{
 		if(val.IsBool())
 			t = val.GetBool();
 	}
 
-	const char* GetJosnText()
+	const char* GetJsonText()
 	{
 		return m_buf.GetString();
 	}
 
 private:
-	StringBuffer m_buf; //json字符串的buf.
+    rapidjson::StringBuffer m_buf; //json字符串的buf.
 	JsonWriter m_writer; //json写入器.
-	Document m_doc;
+    rapidjson::Document m_doc;
 };
+} // namespace kapok
+
