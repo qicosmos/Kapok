@@ -50,7 +50,7 @@ static inline auto make(const std::array<std::string, N>&ar, unsigned index, T c
 #define PAIR_OBJECT(t)          std::make_pair(#t, ADD_REFERENCE(t))
 #define PAIR_OBJECT_CONST(t)    std::make_pair(#t, ADD_REFERENCE_CONST(t))
 #define MAKE_TUPLE(...)         auto Meta() { return std::make_tuple(__VA_ARGS__); }
-//#define MAKE_TUPLE_CONST(...)   auto tuple() const { return std::make_tuple(__VA_ARGS__); }
+#define MAKE_TUPLE_CONST(...)   auto Meta() const { return std::make_tuple(__VA_ARGS__); }
 
 /* arg list expand macro, now support 40 args */
 #define MAKE_ARG_LIST_1(op, arg, ...)   op(arg)
@@ -103,8 +103,8 @@ static inline auto make(const std::array<std::string, N>&ar, unsigned index, T c
         MACRO_CONCAT(MAKE_ARG_LIST, N)(op, arg, __VA_ARGS__)
 
 #define EMMBED_TUPLE(N, ...) \
-MAKE_TUPLE(MAKE_ARG_LIST(N, PAIR_OBJECT, __VA_ARGS__)) 
-//MAKE_TUPLE_CONST(MAKE_ARG_LIST(N, PAIR_OBJECT_CONST, __VA_ARGS__))
+MAKE_TUPLE(MAKE_ARG_LIST(N, PAIR_OBJECT, __VA_ARGS__)) \
+MAKE_TUPLE_CONST(MAKE_ARG_LIST(N, PAIR_OBJECT_CONST, __VA_ARGS__))
 
 #define RSEQ_N() \
 		 119,118,117,116,115,114,113,112,111,110,\
