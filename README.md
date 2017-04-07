@@ -7,3 +7,6 @@ Kapok---一个更好的序列化/反序列化库
 
 wiki介绍：https://github.com/qicosmos/Kapok/wiki
 社区：http://purecpp.org/
+
+
+Now there is a better serialization libray:https://github.com/qicosmos/iguana please replace kapok with iguana.
